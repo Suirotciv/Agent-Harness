@@ -4,6 +4,14 @@ Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an in
 
 ---
 
+## 2026-04-19 — PyPI 0.1.0a1 alpha prep (build + release workflow)
+
+**Added / updated in `PROJECT_CONTEXT.md`:** CURRENT STATUS line `Last Release: 0.1.0a1 (alpha)`; Checkpoint 1 sprint row **PyPI 0.1.0-alpha prep** **DONE**; `CHANGELOG.md` section `[0.1.0a1]`.
+
+**What shipped:** `pyproject.toml` `version = "0.1.0a1"`, setuptools build backend + package discovery, `license = { text = "Apache-2.0" }`, keywords/classifiers/`Issues` URL; `src/agentharness/__init__.py` `__version__`; `src/agentharness/py.typed`; `.github/workflows/release.yml` (tags `v*.*.*` / `v*.*.*a*`, `twine upload` via `PYPI_API_TOKEN`).
+
+---
+
 ## 2026-04-19 — Replay mode (interceptor, runner, CLI)
 
 **Added / updated in `PROJECT_CONTEXT.md`:** KEY FILE LOCATIONS: `interceptor.py` REPLAY + `core/runner.py` `cassette_path=`; Checkpoint 1 sprint row **Replay mode** **DONE**; `CHANGELOG.md` [Unreleased].

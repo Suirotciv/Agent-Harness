@@ -1,5 +1,7 @@
 """AgentHarness -- open-source test harness for AI agents that take real-world actions."""
 
+__version__ = "0.1.0a1"
+
 from agentharness.assertions import (
     AssertionResult,
     assert_approval_gate,

@@ -2,7 +2,15 @@
 
 All notable changes to AgentHarness will be documented in this file.
 
-## [Unreleased]
+## [0.1.0a1] -- 2026-04-19
+
+### Summary
+
+First alpha release. Checkpoint 1 complete: record, replay,
+regression diff, and pytest-native behavioral assertions
+for LangGraph agents. Not yet recommended for production use.
+
+### Included
 
 ### Added
 - `src/agentharness/reporting/diff.py`: `TraceDiff`, `SpanDiff`,
@@ -69,3 +77,9 @@ All notable changes to AgentHarness will be documented in this file.
 - `project_context.md`: KI-001 and KI-005 marked RESOLVED; AD-002 expanded with LangGraph native `wrap_tool_call` discovery; Sprint 1 task table updated; DOMAIN KNOWLEDGE section documents runtime config and ToolNode return shape
 - `project_context.md`: Sprint 1 exit criteria **Evidence** paragraph (test + YAML + synthetic spans); AD-011 (`AssertionResult` / compliance assertion returns); CONTRIBUTION PROCESS UTF-8 file list extended for assertion unit tests saved as UTF-16 on Windows
 - `pyproject.toml`: optional `[dev]` extra with `pytest-asyncio` and `types-PyYAML`; `[all]` includes `dev`; runtime dependency `pyyaml`
+
+
+## [Unreleased]
+
+- pyproject.toml URLs corrected to https://github.com/Suirotciv/AGENTHARNESS; dist/ and *.egg-info/ added to .gitignore.
+
