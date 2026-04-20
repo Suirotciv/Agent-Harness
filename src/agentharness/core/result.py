@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from agentharness.core.trace import Trace
+from agentharness.mocks.interceptor import ToolCallRecord
 
 
 @dataclass
@@ -17,3 +18,4 @@ class RunResult:
     trace: Trace
     scenario_path: str | None = None
     assertion_errors: list[str] = field(default_factory=list)
+    tool_call_records: list[ToolCallRecord] = field(default_factory=list)

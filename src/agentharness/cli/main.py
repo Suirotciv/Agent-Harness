@@ -36,9 +36,53 @@ def _build_parser() -> argparse.ArgumentParser:
         default="mock",
         help="Execution mode (default: mock). AD-005: mock is safe-by-default; live does not enable extra flags in Phase 0.",
     )
+    run_p.add_argument(
+        "--replay",
+        nargs="?",
+        const="",
+        default=None,
+        metavar="CASSETTE",
+        help=(
+            "Replay tool responses from a cassette JSON file. Optional path "
+            "(default: cassettes/<scenario_stem>.json under cwd). Forces replay mode."
+        ),
+    )
 
     sub.add_parser("watch", help="(Planned) Watch a live agent run.")
-    sub.add_parser("record", help="(Planned) Record tool traffic to cassette.")
+    record_p = sub.add_parser(
+        "record",
+        help="Record tool traffic from a scenario run to a cassette JSON file.",
+    )
+    record_p.add_argument(
+        "scenario",
+        type=str,
+        metavar="SCENARIO",
+        help="Path to a scenario YAML file.",
+    )
+    record_p.add_argument(
+        "--output",
+        "-o",
+        type=str,
+        default=None,
+        metavar="PATH",
+        help="Cassette output path (default: cassettes/<scenario_stem>.json under cwd).",
+    )
+    record_p.add_argument(
+        "--mode",
+        choices=("live", "mock"),
+        default="live",
+        help="Execution mode (default: live). AD-005: live requires --allow-real-tools.",
+    )
+    record_p.add_argument(
+        "--allow-sensitive-recording",
+        action="store_true",
+        help="Disable PII scrubbing in the saved cassette (secrets still scrubbed).",
+    )
+    record_p.add_argument(
+        "--allow-real-tools",
+        action="store_true",
+        help="Required with --mode live to confirm intentional real tool execution.",
+    )
     sub.add_parser("report", help="(Planned) Generate compliance/report output.")
 
     return parser
@@ -57,6 +101,9 @@ def cli() -> None:
     if args.command == "watch":
         raise SystemExit(_stub(args))
     if args.command == "record":
-        raise SystemExit(_stub(args))
+        from agentharness.cli.record import record_command
+
+        code = record_command(args)
+        raise SystemExit(code)
     if args.command == "report":
         raise SystemExit(_stub(args))

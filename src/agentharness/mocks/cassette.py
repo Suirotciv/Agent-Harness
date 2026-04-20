@@ -13,6 +13,7 @@ import copy
 import hashlib
 import json
 import re
+import sys
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -153,6 +154,15 @@ class Cassette:
     secrets_scrubbed: bool = True
     pii_scrubbed: bool = True
 
+    def lookup(self, tool_name: str, args: dict[str, Any]) -> Any | None:
+        """Return the recorded response for ``tool_name`` + normalized ``args``, or ``None``."""
+        norm = normalize_args(args)
+        key = make_cassette_key(tool_name, norm)
+        for e in self.entries:
+            if e.key == key:
+                return e.response
+        return None
+
 
 def save(cassette: Cassette, path: str | Path) -> Path:
     """Write ``cassette`` as pretty-printed JSON (UTF-8, no BOM).
@@ -240,14 +250,73 @@ def load(path: str | Path) -> Cassette:
 
 def lookup(cassette: Cassette, tool_name: str, args: dict[str, Any]) -> Any | None:
     """Return the recorded response for ``tool_name`` + ``args``, or ``None``."""
-    key = make_cassette_key(tool_name, args)
-    for e in cassette.entries:
-        if e.key == key:
-            return e.response
-    return None
+    return cassette.lookup(tool_name, args)
 
 
 def default_cassette_path(scenario_name: str, *, base_dir: Path | None = None) -> Path:
     """Return ``cassettes/{scenario_name}.json`` under ``base_dir`` or the cwd."""
     root = base_dir if base_dir is not None else Path.cwd()
     return (root / "cassettes" / f"{scenario_name}.json").resolve()
+
+
+def verify_replay_determinism(
+    scenario_path: str | Path,
+    cassette_path: str | Path | None,
+    *,
+    runs: int = 10,
+) -> bool:
+    """Run ``scenario_path`` in replay mode ``runs`` times; return whether pass/fail matches each time.
+
+    Compares :class:`~agentharness.assertions.base.AssertionResult` outcomes by
+    ``(passed, assertion_name)`` per run. On mismatch, prints a short summary to stderr.
+    """
+    from agentharness.assertions.base import (
+        AssertionResult,
+        reset_results_collector,
+        set_results_collector,
+    )
+    from agentharness.cli.run import _run_yaml_assertions
+    from agentharness.core.runner import run_scenario
+
+    path = Path(scenario_path)
+    if not path.is_file():
+        msg = f"scenario not found: {path}"
+        raise FileNotFoundError(msg)
+
+    import yaml
+
+    raw = path.read_text(encoding="utf-8")
+    loaded = yaml.safe_load(raw)
+    data: dict[str, Any] = loaded if isinstance(loaded, dict) else {}
+
+    resolved: Path = (
+        Path(cassette_path).resolve()
+        if cassette_path is not None
+        else default_cassette_path(path.stem)
+    )
+
+    signatures: list[list[tuple[bool, str]]] = []
+    for _ in range(runs):
+        collected: list[AssertionResult] = []
+        tok = set_results_collector(collected)
+        try:
+            result = run_scenario(path, mode="replay", cassette_path=resolved)
+            try:
+                _run_yaml_assertions(data, result.trace)
+            except AssertionError:
+                pass
+        finally:
+            reset_results_collector(tok)
+
+        signatures.append([(r.passed, r.assertion_name) for r in collected])
+
+    first = signatures[0]
+    diverged = [i for i, sig in enumerate(signatures[1:], start=2) if sig != first]
+    if diverged:
+        sys.stderr.write(
+            "Replay determinism check failed: runs "
+            f"{', '.join(str(n) for n in diverged)} "
+            f"differ from run 1 (first run: {len(first)} assertion outcomes).\n",
+        )
+        return False
+    return True

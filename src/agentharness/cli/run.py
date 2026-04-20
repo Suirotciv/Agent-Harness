@@ -17,6 +17,7 @@ from agentharness.assertions.base import (
 from agentharness.assertions.structural import assert_called_before
 from agentharness.core.runner import run_scenario
 from agentharness.core.trace import Trace
+from agentharness.mocks.interceptor import ReplayCassetteError
 from agentharness.reporting.console import ConsoleReporter
 from agentharness.telemetry import schema as S
 
@@ -78,19 +79,39 @@ def run_command(args: argparse.Namespace) -> int:
     tok = set_results_collector(collected)
     try:
         try:
-            result = run_scenario(raw_path)
+            replay_arg = getattr(args, "replay", None)
+            if replay_arg is not None:
+                if "--mode" in sys.argv:
+                    sys.stderr.write(
+                        "WARNING: --mode is ignored when --replay is set. "
+                        "Replay mode is always used with a cassette.\n",
+                    )
+                cassette_kw = Path(replay_arg).resolve() if replay_arg else None
+                result = run_scenario(
+                    raw_path,
+                    mode="replay",
+                    cassette_path=cassette_kw,
+                )
+                result.trace.attributes[S.HARNESS_MODE] = "replay"
+            else:
+                result = run_scenario(raw_path, mode=str(args.mode))
+                result.trace.attributes[S.HARNESS_MODE] = str(args.mode)
+
+            try:
+                _run_yaml_assertions(data, result.trace)
+            except AssertionError:
+                pass  # ``finish`` already recorded the :class:`AssertionResult` on the list before raising
+            except ValueError as exc:
+                sys.stderr.write(f"agentharness run: invalid scenario content: {exc}\n")
+                return 2
+        except ReplayCassetteError as exc:
+            sys.stderr.write(f"{exc}\n")
+            return 2
+        except FileNotFoundError as exc:
+            sys.stderr.write(f"agentharness run: cassette not found: {exc}\n")
+            return 2
         except OSError as exc:
             sys.stderr.write(f"agentharness run: could not run scenario: {exc}\n")
-            return 2
-
-        result.trace.attributes[S.HARNESS_MODE] = str(args.mode)
-
-        try:
-            _run_yaml_assertions(data, result.trace)
-        except AssertionError:
-            pass  # ``finish`` already recorded the :class:`AssertionResult` on the list before raising
-        except ValueError as exc:
-            sys.stderr.write(f"agentharness run: invalid scenario content: {exc}\n")
             return 2
     finally:
         reset_results_collector(tok)

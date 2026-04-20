@@ -16,12 +16,15 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
+from agentharness.mocks.cassette import Cassette, normalize_args
+
 
 class InterceptMode(Enum):
     """Execution mode for intercepted tool calls."""
 
     MOCK = "mock"
     LIVE = "live"
+    REPLAY = "replay"
 
 
 @dataclass
@@ -57,11 +60,24 @@ class MockNotConfiguredError(Exception):
         )
 
 
+class ReplayCassetteError(Exception):
+    """Raised in REPLAY mode when no cassette entry matches tool name + args (AD-005)."""
+
+    def __init__(self, tool_name: str, tool_args: dict[str, Any]) -> None:
+        self.tool_name = tool_name
+        self.tool_args = tool_args
+        super().__init__(
+            f"No cassette entry found for tool '{tool_name}' with args {tool_args!r}. "
+            "Re-record the cassette or add a manual entry."
+        )
+
+
 class HarnessInterceptor:
     """Records tool calls and routes execution based on mode.
 
     In MOCK mode, returns pre-configured responses from the mock registry.
     In LIVE mode, delegates to the real tool and records the response.
+    In REPLAY mode, returns responses from a loaded :class:`~agentharness.mocks.cassette.Cassette`.
 
     This class has no framework-specific knowledge. Adapters provide the
     bridge between this class and framework-specific hook points (e.g.
@@ -73,10 +89,15 @@ class HarnessInterceptor:
         *,
         mode: InterceptMode = InterceptMode.MOCK,
         mock_responses: dict[str, Any] | None = None,
+        cassette: Cassette | None = None,
     ) -> None:
         self.mode = mode
         self.mock_responses: dict[str, Any] = mock_responses or {}
+        self.cassette: Cassette | None = cassette
         self.calls: list[ToolCallRecord] = []
+        if mode is InterceptMode.REPLAY and cassette is None:
+            msg = "REPLAY mode requires a cassette"
+            raise ValueError(msg)
 
     def record_call(
         self,
@@ -147,6 +168,23 @@ class HarnessInterceptor:
         """
         start = time.monotonic()
 
+        if self.mode is InterceptMode.REPLAY:
+            assert self.cassette is not None
+            norm = normalize_args(args)
+            response = self.cassette.lookup(tool_name, norm)
+            if response is None:
+                raise ReplayCassetteError(tool_name, norm)
+            duration = (time.monotonic() - start) * 1000
+            self.record_call(
+                tool_name,
+                args,
+                tool_call_id,
+                response=response,
+                duration_ms=duration,
+                was_mocked=True,
+            )
+            return response
+
         if self.mode is InterceptMode.MOCK:
             response = self.get_mock_response(tool_name)
             duration = (time.monotonic() - start) * 1000
@@ -199,6 +237,23 @@ class HarnessInterceptor:
         Same contract as intercept_sync but awaits execute_real.
         """
         start = time.monotonic()
+
+        if self.mode is InterceptMode.REPLAY:
+            assert self.cassette is not None
+            norm = normalize_args(args)
+            response = self.cassette.lookup(tool_name, norm)
+            if response is None:
+                raise ReplayCassetteError(tool_name, norm)
+            duration = (time.monotonic() - start) * 1000
+            self.record_call(
+                tool_name,
+                args,
+                tool_call_id,
+                response=response,
+                duration_ms=duration,
+                was_mocked=True,
+            )
+            return response
 
         if self.mode is InterceptMode.MOCK:
             response = self.get_mock_response(tool_name)

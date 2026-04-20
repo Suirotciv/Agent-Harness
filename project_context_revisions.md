@@ -4,6 +4,28 @@ Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an in
 
 ---
 
+## 2026-04-19 — Replay mode (interceptor, runner, CLI)
+
+**Added / updated in `PROJECT_CONTEXT.md`:** KEY FILE LOCATIONS: `interceptor.py` REPLAY + `core/runner.py` `cassette_path=`; Checkpoint 1 sprint row **Replay mode** **DONE**; `CHANGELOG.md` [Unreleased].
+
+**What shipped:** `InterceptMode.REPLAY`, `ReplayCassetteError`, `HarnessInterceptor(..., cassette=)`; `run_scenario(..., mode="replay", cassette_path=)`; `verify_replay_determinism()`; `agentharness run --replay`; tests `tests/unit/test_replay.py`.
+
+---
+
+## 2026-04-19 — PROJECT_CONTEXT sprint tables (owner labels)
+
+Owner labels normalized to Founder throughout sprint tables; artifact scan clean.
+
+---
+
+## 2026-04-19 — cli/record.py (`agentharness record`)
+
+**Added / updated in `PROJECT_CONTEXT.md`:** KEY FILE LOCATIONS line for `src/agentharness/cli/record.py`; Checkpoint 1 sprint row **cli/record.py** **DONE**; `CHANGELOG.md` [Unreleased].
+
+**What shipped:** `record_command` (`--output`, `--mode` live/mock, `--allow-real-tools`, `--allow-sensitive-recording`); `core/runner.py` optional `mode` override; `RunResult.tool_call_records`; `tests/unit/test_cli_record.py`.
+
+---
+
 ## 2026-04-19 — mocks/cassette.py (KI-002, KI-006)
 
 **Added / updated in PROJECT_CONTEXT.md:** KEY FILE LOCATIONS line for src/agentharness/mocks/cassette.py; KI-002 and KI-006 **RESOLVED** with evidence; Checkpoint 1 sprint row **mocks/cassette.py** **DONE**; exit criterion bullet for KI-002/KI-006 references cassette helpers.
@@ -44,7 +66,7 @@ Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an in
 
 ## 2026-04-19 — UTF-16 warning list: `README.md` + `CHANGELOG.md`
 
-**Added / updated in `PROJECT_CONTEXT.md`:** Under **CONTRIBUTION PROCESS → Windows: UTF-8 for `.py` files**, the Cursor/Write/StrReplace hit list now includes `README.md` and `CHANGELOG.md` (confirmed on this machine during Phase 0 close-out: `__main__.py` + README/CHANGELOG edits). Added a short note that repo Markdown is not exempt and that the same UTF-16 LE pattern and UTF-8 re-save fix apply.
+**Added / updated in `PROJECT_CONTEXT.md`:** Under **CONTRIBUTION PROCESS → Windows: UTF-8 for `.py` files**, the list of files affected by UTF-16 save issues now includes `README.md` and `CHANGELOG.md` (confirmed on this machine during Phase 0 close-out: `__main__.py` + README/CHANGELOG edits). Added a short note that repo Markdown is not exempt and that the same UTF-16 LE pattern and UTF-8 re-save fix apply.
 
 ---
 

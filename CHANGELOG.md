@@ -5,6 +5,10 @@ All notable changes to AgentHarness will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- Replay: `HarnessInterceptor` REPLAY mode + `ReplayCassetteError`; `run_scenario(..., cassette_path=)`; `agentharness run --replay`; `verify_replay_determinism()` in `mocks/cassette.py`. Tests: `tests/unit/test_replay.py`.
+
+- `src/agentharness/cli/record.py`: `agentharness record` writes a sanitized cassette from `run_scenario` tool-call records; `--output` / default `cassettes/<stem>.json`; `--mode live` requires `--allow-real-tools` (AD-005); `--allow-sensitive-recording` (PII off). `core/runner.py` optional `mode` override; `RunResult.tool_call_records`. Tests: `tests/unit/test_cli_record.py`.
+
 - src/agentharness/mocks/cassette.py: Cassette / CassetteEntry, make_cassette_key (KI-002), sanitize and save/load/lookup (KI-006, AD-005), default_cassette_path; `tests/unit/test_cassette.py`.
 
 - `src/agentharness/telemetry/collector.py`: `TraceCollector` (ToolCallRecord → OpenInference TOOL spans with tool.name, input.value, output.value); `core/runner.py` and `examples/01_customer_support_langgraph/support/executor.py` wrap `HarnessInterceptor.record_call` to feed the collector; `support/trace_builder.py` stubbed; `tests/unit/test_collector.py`. Ruff `extend-exclude` narrowed to `assertions` and `adapters` only so `telemetry/` is linted.

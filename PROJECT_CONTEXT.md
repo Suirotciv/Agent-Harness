@@ -257,7 +257,8 @@ pip install "agentharness[all]"                   # Everything (includes dev ext
 src/agentharness/core/scenario.py       -> Scenario DSL -- start here to understand data model
 src/agentharness/core/trace.py          -> Trace schema -- start here to understand output format
 ~~src/agentharness/mocks/interceptor.py   -> Tool intercept -- the most critical piece of Phase 0~~
-src/agentharness/mocks/interceptor.py   -> HarnessInterceptor + ToolCallRecord -- framework-agnostic intercept core
+src/agentharness/mocks/interceptor.py   -> HarnessInterceptor + ToolCallRecord -- MOCK / LIVE / **REPLAY** (cassette lookup); framework-agnostic intercept core
+src/agentharness/core/runner.py          -> run_scenario(..., mode=, cassette_path= keyword-only) — replay mode loads cassette (default path `cassettes/<stem>.json` when path omitted)
 src/agentharness/mocks/cassette.py -> Cassette read/write; make_cassette_key (KI-002), sanitize (KI-006 / AD-005); import from `agentharness.mocks.cassette`
 src/agentharness/adapters/langgraph.py  -> LangGraph ToolNode wiring (native wrap_tool_call + AD-002 fallback)
 src/agentharness/adapters/base.py       -> FrameworkAdapter contract -- implement this for new adapters
@@ -265,6 +266,7 @@ src/agentharness/assertions/safety.py   -> Most important assertions (approval g
 src/agentharness/pytest_plugin.py       -> Pytest plugin: `run` fixture, marker registration (pytest11 entry point)
 src/agentharness/reporting/console.py  -> ConsoleReporter; formats AssertionResult for terminal output; called by pytest plugin hooks and `agentharness run` CLI
 src/agentharness/cli/run.py            -> `agentharness run` subcommand; loads scenario YAML, runs via `core/runner.py`, formats output via `ConsoleReporter`
+src/agentharness/cli/record.py         -> `agentharness record` subcommand; records a scenario run to a sanitized cassette file; `--mode live` requires `--allow-real-tools` per AD-005
 src/agentharness/scenario.py            -> `@scenario` decorator (AD-004)
 src/agentharness/telemetry/jsonl.py -> Trace JSONL read/write (AD-008); import from `telemetry.jsonl`, not `telemetry` package root
 src/agentharness/telemetry/collector.py -> TraceCollector; converts ToolCallRecord → Span → Trace; import from `agentharness.telemetry.collector` not package root
@@ -303,16 +305,16 @@ pyproject.toml                          -> All dependencies and tool configurati
 
 | Task | Owner | Status | Notes |
 |---|---|---|---|
-| Validate LangGraph ToolNode wrapping approach (sync) | Engineer 1 | ~~TODO~~ **DONE** | ~~See KI-001 -- this is the critical path~~ KI-001; native + fallback covered in `test_langgraph_intercept.py` |
-| Validate LangGraph ToolNode wrapping approach (async) | Engineer 1 | ~~TODO~~ **DONE** | ~~See KI-005 -- must validate alongside sync~~ KI-005; async native + fallback covered |
-| Define Span and Trace dataclasses | Engineer 1 | ~~TODO~~ **DONE** | `core/trace.py` (`Trace`, `Span`), `telemetry/schema.py` (keys); tests: `tests/unit/test_trace_models.py`. Collector / JSONL next. |
-| Implement `interceptor.py` core | Engineer 1 | ~~TODO~~ **DONE** | ~~Mock mode only first. Both sync and async.~~ `HarnessInterceptor`, MOCK/LIVE, sync/async; `MockNotConfiguredError` per AD-005 |
-| Wire LangGraph adapter (`adapters/langgraph.py`) | Engineer 1 | **DONE** | *(Row added 2026-04-19.)* Native wrappers + fallback; documented in AD-002 |
-| Implement `assert_called_before` | Engineer 2 | **DONE** | `assertions/structural.py`; tests `tests/unit/test_assert_called_before.py`; exported from `agentharness` and `agentharness.assertions`. |
-| Pytest plugin skeleton | Engineer 2 | **DONE** | `pytest_plugin.py`: `run` fixture + `agentharness_scenario` marker; `scenario.py`: `@scenario` decorator; `core/runner.py` `run_scenario()` (Phase 0 shell trace). Entry point `pytest11` → `agentharness.pytest_plugin`. Tests: `tests/unit/test_pytest_plugin.py`; `tests/conftest.py` enables `pytester` for plugin tests. |
-| `pyproject.toml` setup | Engineer 2 | ~~TODO~~ **DONE** | Dependencies, entry points, test config; UTF-8 encoding verified |
-| GitHub Actions CI basic | Engineer 2 | **DONE** | `.github/workflows/ci.yml`: PR + push to `main`/`master`; matrix Python 3.10–3.12; `pip install -e ".[langgraph,dev]"`; `python -m pytest tests/unit/ -v`. |
-| Document fallback architecture plan for KI-001 | Engineer 1 | ~~TODO~~ **DONE** | ~~What if ToolNode wrapping requires revision?~~ Implemented as `create_intercepted_tool_node_fallback` + tests; AD-002 updated |
+| Validate LangGraph ToolNode wrapping approach (sync) | Founder | ~~TODO~~ **DONE** | ~~See KI-001 -- this is the critical path~~ KI-001; native + fallback covered in `test_langgraph_intercept.py` |
+| Validate LangGraph ToolNode wrapping approach (async) | Founder | ~~TODO~~ **DONE** | ~~See KI-005 -- must validate alongside sync~~ KI-005; async native + fallback covered |
+| Define Span and Trace dataclasses | Founder | ~~TODO~~ **DONE** | `core/trace.py` (`Trace`, `Span`), `telemetry/schema.py` (keys); tests: `tests/unit/test_trace_models.py`. Collector / JSONL next. |
+| Implement `interceptor.py` core | Founder | ~~TODO~~ **DONE** | ~~Mock mode only first. Both sync and async.~~ `HarnessInterceptor`, MOCK/LIVE, sync/async; `MockNotConfiguredError` per AD-005 |
+| Wire LangGraph adapter (`adapters/langgraph.py`) | Founder | **DONE** | *(Row added 2026-04-19.)* Native wrappers + fallback; documented in AD-002 |
+| Implement `assert_called_before` | Founder | **DONE** | `assertions/structural.py`; tests `tests/unit/test_assert_called_before.py`; exported from `agentharness` and `agentharness.assertions`. |
+| Pytest plugin skeleton | Founder | **DONE** | `pytest_plugin.py`: `run` fixture + `agentharness_scenario` marker; `scenario.py`: `@scenario` decorator; `core/runner.py` `run_scenario()` (Phase 0 shell trace). Entry point `pytest11` → `agentharness.pytest_plugin`. Tests: `tests/unit/test_pytest_plugin.py`; `tests/conftest.py` enables `pytester` for plugin tests. |
+| `pyproject.toml` setup | Founder | ~~TODO~~ **DONE** | Dependencies, entry points, test config; UTF-8 encoding verified |
+| GitHub Actions CI basic | Founder | **DONE** | `.github/workflows/ci.yml`: PR + push to `main`/`master`; matrix Python 3.10–3.12; `pip install -e ".[langgraph,dev]"`; `python -m pytest tests/unit/ -v`. |
+| Document fallback architecture plan for KI-001 | Founder | ~~TODO~~ **DONE** | ~~What if ToolNode wrapping requires revision?~~ Implemented as `create_intercepted_tool_node_fallback` + tests; AD-002 updated |
 
 **Sprint 1 Exit Criteria:**
 ```python
@@ -334,16 +336,16 @@ def test_lookup_called_before_refund(run):
 
 | Task | Owner | Status | Notes |
 |---|---|---|---|
-| `assert_call_count`, `assert_completion`, `assert_mutual_exclusion` | Engineer 1 | **DONE** | `assertions/structural.py`; tests `tests/unit/test_structural_batch.py`; exported from `agentharness` / `agentharness.assertions`. |
-| `assert_arg_lte`, `assert_arg_pattern`, `assert_arg_schema`, `assert_arg_not_contains` | Engineer 2 | **DONE** | `assertions/argument.py`; tests `tests/unit/test_argument_assertions.py`; `jsonschema` for schema validation. |
-| `assert_approval_gate`, `assert_no_loop` | Engineer 1 | **DONE** | `assertions/safety.py`; tests `tests/unit/test_safety_assertions.py`. Approval: `approved` / `approval_id` on tool args (Phase 0); refine with AD-009. |
-| `assert_cost_under` + tokencost integration | Engineer 2 | **DONE** | `assertions/resource.py`; `harness.estimated_cost_usd` or token counts + optional `tokencost`; tests `tests/unit/test_resource_assertions.py`; extra `resource` / `tokencost` in `dev`. |
-| Trace JSONL serialization | Engineer 1 | **DONE** | `telemetry/jsonl.py` (`trace_to_jsonl_line`, `write_trace_jsonl`, `iter_traces_jsonl`, AD-008 `default_trace_path` / `write_trace_to_default_location`). Not re-exported from `telemetry/__init__.py` (avoids circular import with `core.trace`). Tests: `tests/unit/test_trace_jsonl.py`. |
-| Console reporter (pytest-style output) | Engineer 2 | **DONE** | `reporting/console.py` (`ConsoleReporter`, rich with plain fallback); `pytest_runtest_logreport` / `pytest_runtest_makereport` / `pytest_terminal_summary` in `pytest_plugin.py`; `LOGREPORT_PENDING` + item stash in `assertions/base.py`; tests `tests/unit/test_console_reporter.py`. |
-| Example 01: Customer support refund agent | Engineer 1 | **DONE** | `examples/01_customer_support_langgraph/`: `support/refund_tools.py` (6 mock tools), `support/executor.py` (LangGraph ``ToolNode`` + interceptor, YAML ``steps``), 5 scenarios under `scenarios/`, `test_refund_agent.py`, README; local ``run`` fixture. |
-| `agentharness run` CLI command | Engineer 2 | **DONE** | `cli/main.py` (argparse group + stubs), `cli/run.py` (YAML + `run_scenario` + `harness.mode`, `set_results_collector` + `ConsoleReporter`); `[project.scripts]` → `cli:cli`; Phase 0 exit: `scenarios/safety/refund_limit_guard.yaml`; tests `tests/unit/test_cli_run.py`. |
-| README first draft | Both | **DONE** | Root `README.md`: install (`pip install -e .` / `.[langgraph,dev]` + extras pointer), quickstart (example `test_happy_path`), assertion table from `REFS_*`, CLI one-liner, roadmap (text only; no `Founder_Docs/` link), license, contributing pointer. |
-| Phase 0 exit review | Both | **DONE** | Exit review 2026-04-19: Sprint 1 criterion test passes; examples + 67 unit tests + CLI `run` + CI matrix + AD-002 fallback + KI-001/005/007 evidence verified; `pip install -e ".[langgraph,dev]"` OK; `Span.status_code` default set for mypy (`core/trace.py`). |
+| `assert_call_count`, `assert_completion`, `assert_mutual_exclusion` | Founder | **DONE** | `assertions/structural.py`; tests `tests/unit/test_structural_batch.py`; exported from `agentharness` / `agentharness.assertions`. |
+| `assert_arg_lte`, `assert_arg_pattern`, `assert_arg_schema`, `assert_arg_not_contains` | Founder | **DONE** | `assertions/argument.py`; tests `tests/unit/test_argument_assertions.py`; `jsonschema` for schema validation. |
+| `assert_approval_gate`, `assert_no_loop` | Founder | **DONE** | `assertions/safety.py`; tests `tests/unit/test_safety_assertions.py`. Approval: `approved` / `approval_id` on tool args (Phase 0); refine with AD-009. |
+| `assert_cost_under` + tokencost integration | Founder | **DONE** | `assertions/resource.py`; `harness.estimated_cost_usd` or token counts + optional `tokencost`; tests `tests/unit/test_resource_assertions.py`; extra `resource` / `tokencost` in `dev`. |
+| Trace JSONL serialization | Founder | **DONE** | `telemetry/jsonl.py` (`trace_to_jsonl_line`, `write_trace_jsonl`, `iter_traces_jsonl`, AD-008 `default_trace_path` / `write_trace_to_default_location`). Not re-exported from `telemetry/__init__.py` (avoids circular import with `core.trace`). Tests: `tests/unit/test_trace_jsonl.py`. |
+| Console reporter (pytest-style output) | Founder | **DONE** | `reporting/console.py` (`ConsoleReporter`, rich with plain fallback); `pytest_runtest_logreport` / `pytest_runtest_makereport` / `pytest_terminal_summary` in `pytest_plugin.py`; `LOGREPORT_PENDING` + item stash in `assertions/base.py`; tests `tests/unit/test_console_reporter.py`. |
+| Example 01: Customer support refund agent | Founder | **DONE** | `examples/01_customer_support_langgraph/`: `support/refund_tools.py` (6 mock tools), `support/executor.py` (LangGraph ``ToolNode`` + interceptor, YAML ``steps``), 5 scenarios under `scenarios/`, `test_refund_agent.py`, README; local ``run`` fixture. |
+| `agentharness run` CLI command | Founder | **DONE** | `cli/main.py` (argparse group + stubs), `cli/run.py` (YAML + `run_scenario` + `harness.mode`, `set_results_collector` + `ConsoleReporter`); `[project.scripts]` → `cli:cli`; Phase 0 exit: `scenarios/safety/refund_limit_guard.yaml`; tests `tests/unit/test_cli_run.py`. |
+| README first draft | Founder | **DONE** | Root `README.md`: install (`pip install -e .` / `.[langgraph,dev]` + extras pointer), quickstart (example `test_happy_path`), assertion table from `REFS_*`, CLI one-liner, roadmap (text only; no `Founder_Docs/` link), license, contributing pointer. |
+| Phase 0 exit review | Founder | **DONE** | Exit review 2026-04-19: Sprint 1 criterion test passes; examples + 67 unit tests + CLI `run` + CI matrix + AD-002 fallback + KI-001/005/007 evidence verified; `pip install -e ".[langgraph,dev]"` OK; `Span.status_code` default set for mypy (`core/trace.py`). |
 
 **Phase 0 Exit Criteria:**
 - `examples/01_customer_support_langgraph/` runs cleanly with `pytest`
@@ -382,14 +384,14 @@ Items confirmed for Phase 1 but not yet sprint-planned. Ordering reflects priori
 
 | Task | Owner | Status | Notes |
 |---|---|---|---|
-| .gitattributes + LF normalization | Engineer 2 | **DONE** | Enforces LF repo-wide via `.gitattributes`; `git add --renormalize .` applied; resolves LF→CRLF Git warnings on Windows. *(Infrastructure add-on before collector work; not in original sprint plan.)* |
-| .editorconfig + ruff in CI | Engineer 2 | **DONE** | Root `.editorconfig` (UTF-8, LF, trim rules; `.md` no trim); `[dev]` + `ruff>=0.4.0`; `[tool.ruff]` line-length 88, lint E/F/W/I (E501 ignored until docstring wrap); `[tool.ruff.format]`; parallel `lint` job in `ci.yml` (`pip install -e ".[dev]"`, `ruff check` / `ruff format --check` on `src/`). `extend-exclude`: `assertions` + `adapters` only (`telemetry/collector.py` linted). |
-| telemetry/collector.py | Engineer 1 | **DONE** | `TraceCollector` in `telemetry/collector.py`; `record()` → TOOL spans (`tool.name`, `input.value`, `output.value`); `core/runner.py` + example `executor.py` wire `HarnessInterceptor.record_call` → collector; tests `tests/unit/test_collector.py` |
-| mocks/cassette.py | Engineer 1 | **DONE** | `Cassette` / `CassetteEntry`, `make_cassette_key`, `sanitize`, `save`/`load`/`lookup`, `default_cassette_path`; tests `tests/unit/test_cassette.py`; KI-002 + KI-006 |
-| cli/record.py — agentharness record | Engineer 1 | TODO | Live run → sanitized cassette; --allow-sensitive-recording flag per AD-005 |
-| Replay mode — agentharness run --replay | Engineer 2 | TODO | Deterministic re-run from cassette; zero variance across 10 runs of same cassette |
-| reporting/diff.py — regression diff | Engineer 2 | TODO | Structural diff between two traces; human-readable output per reporting/ pattern |
-| Update example 01 to use collector | Engineer 1 | **DONE** | `support/executor.py` uses `TraceCollector`; `trace_builder.py` stubbed (replaced by collector) |
+| .gitattributes + LF normalization | Founder | **DONE** | Enforces LF repo-wide via `.gitattributes`; `git add --renormalize .` applied; resolves LF→CRLF Git warnings on Windows. *(Infrastructure add-on before collector work; not in original sprint plan.)* |
+| .editorconfig + ruff in CI | Founder | **DONE** | Root `.editorconfig` (UTF-8, LF, trim rules; `.md` no trim); `[dev]` + `ruff>=0.4.0`; `[tool.ruff]` line-length 88, lint E/F/W/I (E501 ignored until docstring wrap); `[tool.ruff.format]`; parallel `lint` job in `ci.yml` (`pip install -e ".[dev]"`, `ruff check` / `ruff format --check` on `src/`). `extend-exclude`: `assertions` + `adapters` only (`telemetry/collector.py` linted). |
+| telemetry/collector.py | Founder | **DONE** | `TraceCollector` in `telemetry/collector.py`; `record()` → TOOL spans (`tool.name`, `input.value`, `output.value`); `core/runner.py` + example `executor.py` wire `HarnessInterceptor.record_call` → collector; tests `tests/unit/test_collector.py` |
+| mocks/cassette.py | Founder | **DONE** | `Cassette` / `CassetteEntry`, `make_cassette_key`, `sanitize`, `save`/`load`/`lookup`, `default_cassette_path`; tests `tests/unit/test_cassette.py`; KI-002 + KI-006 |
+| cli/record.py — agentharness record | Founder | **DONE** | `record_command`; `run_scenario(..., mode=)`; cassette from `RunResult.tool_call_records`; `--output` / default `cassettes/<stem>.json`; `--mode live` + `--allow-real-tools`; `--allow-sensitive-recording`; tests `tests/unit/test_cli_record.py` |
+| Replay mode — agentharness run --replay | Founder | **DONE** | `HarnessInterceptor` REPLAY + `ReplayCassetteError` on missing entry; `run_scenario(..., mode='replay', cassette_path=)`; CLI `--replay` (optional path); `verify_replay_determinism()` in `mocks/cassette.py`; tests `tests/unit/test_replay.py` |
+| reporting/diff.py — regression diff | Founder | TODO | Structural diff between two traces; human-readable output per reporting/ pattern |
+| Update example 01 to use collector | Founder | **DONE** | `support/executor.py` uses `TraceCollector`; `trace_builder.py` stubbed (replaced by collector) |
 | PyPI 0.1.0-alpha prep | Both | TODO | Version bump in pyproject.toml; confirm pip install agentharness==0.1.0a1 works from PyPI |
 
 **Checkpoint 1 Exit Criteria:**
@@ -513,7 +515,7 @@ Report vulnerabilities via SECURITY.md instructions. Include: disclosure policy,
 
 PowerShell's `Write-Output`, here-strings piped to `Set-Content`, and some editor save paths on Windows default to **UTF-16 LE** (often with BOM). Python source must be **UTF-8**. A test module saved as UTF-16 can fail collection with an opaque error such as `SyntaxError: source code string cannot contain null bytes` (pytest's AST parse sees the interleaved zero bytes as "null characters"). **Fix:** write or re-save test and source files as **UTF-8** explicitly (e.g. `Set-Content -Encoding utf8`, `open(path, "w", encoding="utf-8")`, or the editor encoding selector). Prefer **UTF-8 without BOM** for `.py` files when the toolchain allows it; UTF-8 with BOM is acceptable for Python 3. If collection fails on a new file, inspect the raw bytes: UTF-16 LE often starts with a **BOM** (hex `FF FE`) or shows **null bytes** between ASCII characters in a hex editor.
 
-**Cursor / editor Write and StrReplace on this machine:** Those code paths have repeatedly produced **UTF-16** for touched files. This is a **documented pattern on this specific machine**, not a hypothetical warning. Files that have already been hit include: `src/agentharness/core/__init__.py`, `tests/unit/test_assert_called_before.py`, `src/agentharness/scenario.py`, `src/agentharness/pytest_plugin.py`, `tests/unit/test_pytest_plugin.py`, `tests/unit/test_argument_assertions.py`, `tests/unit/test_resource_assertions.py`, `tests/unit/test_safety_assertions.py`, `README.md`, and `CHANGELOG.md`. Repository Markdown is not exempt: the same UTF-16 LE pattern (null bytes between characters, or leading `FF FE`) and the same fix apply—decode and re-save as **UTF-8 without BOM** (e.g. `Path.read_bytes().decode("utf-16-le")` then `write_text(..., encoding="utf-8")`, or `[System.IO.File]::WriteAllText` with `UTF8Encoding` constructed without BOM). **Before running pytest** after an agent or local edit, confirm the file is UTF-8. Replace the path in the commands below with the file you changed.
+**Some editor and bulk-edit save paths on this machine:** Certain save operations have repeatedly produced **UTF-16** for touched files. This is a **documented pattern on this specific machine**, not a hypothetical warning. Files that have already been hit include: `src/agentharness/core/__init__.py`, `tests/unit/test_assert_called_before.py`, `src/agentharness/scenario.py`, `src/agentharness/pytest_plugin.py`, `tests/unit/test_pytest_plugin.py`, `tests/unit/test_argument_assertions.py`, `tests/unit/test_resource_assertions.py`, `tests/unit/test_safety_assertions.py`, `README.md`, and `CHANGELOG.md`. Repository Markdown is not exempt: the same UTF-16 LE pattern (null bytes between characters, or leading `FF FE`) and the same fix apply—decode and re-save as **UTF-8 without BOM** (e.g. `Path.read_bytes().decode("utf-16-le")` then `write_text(..., encoding="utf-8")`, or `[System.IO.File]::WriteAllText` with `UTF8Encoding` constructed without BOM). **Before running pytest** after a local or scripted edit, confirm the file is UTF-8. Replace the path in the commands below with the file you changed.
 
 **UTF-8 check (Windows PowerShell 5.1):**
 
