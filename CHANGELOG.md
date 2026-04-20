@@ -5,6 +5,13 @@ All notable changes to AgentHarness will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- `src/agentharness/reporting/diff.py`: `TraceDiff`, `SpanDiff`,
+  `diff_traces` (strict/subset/superset modes), `format_diff`
+  (Rich with plain fallback); `agentharness run --diff PATH`
+  and `--diff-mode` flag on the run subcommand; baseline loaded
+  from cassette `.json` or trace `.jsonl`. Tests:
+  `tests/unit/test_diff.py`.
+
 - Replay: `HarnessInterceptor` REPLAY mode + `ReplayCassetteError`; `run_scenario(..., cassette_path=)`; `agentharness run --replay`; `verify_replay_determinism()` in `mocks/cassette.py`. Tests: `tests/unit/test_replay.py`.
 
 - `src/agentharness/cli/record.py`: `agentharness record` writes a sanitized cassette from `run_scenario` tool-call records; `--output` / default `cassettes/<stem>.json`; `--mode live` requires `--allow-real-tools` (AD-005); `--allow-sensitive-recording` (PII off). `core/runner.py` optional `mode` override; `RunResult.tool_call_records`. Tests: `tests/unit/test_cli_record.py`.
