@@ -2,7 +2,17 @@
 
 Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an inline change would be unreadable, full prior text lands here per document change policy.
 
----
+
+## 2026-04-21 — Documentation dividers (horizontal rules removed)
+
+**`PROJECT_CONTEXT.md`:** removed standalone `---` lines used as visual section breaks (structure unchanged: headings remain).
+
+**`project_context_revisions.md`:** same; entries separated by blank lines only.
+
+**`docs/index.html`:** removed `<hr>`; section separation via CSS on `h2` siblings.
+
+**`CHANGELOG.md`:** version headings use a single hyphen before dates (e.g. `[0.1.0a2] - YYYY-MM-DD`).
+
 
 ## 2026-04-21 — GitHub Pages static landing (`docs/index.html`)
 
@@ -10,7 +20,6 @@ Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an in
 
 **What shipped:** `docs/index.html` (single-file, inline CSS, no CDN); `docs/README.md` one-line pointer so the `docs/` folder is not mistaken for a second project README; `CHANGELOG.md` [Unreleased] bullet.
 
----
 
 ## 2026-04-20 — PyPI 0.1.0a2 (documentation release)
 
@@ -18,7 +27,6 @@ Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an in
 
 **What shipped:** `pyproject.toml` / `__version__` **0.1.0a2**; `CHANGELOG.md` `[0.1.0a2]`; README and `docs/demo.md` install pins; no runtime API changes.
 
----
 
 ## 2026-04-19 — PyPI 0.1.0a1 alpha prep (build + release workflow)
 
@@ -26,7 +34,6 @@ Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an in
 
 **What shipped:** `pyproject.toml` `version = "0.1.0a1"`, setuptools build backend + package discovery, `license = { text = "Apache-2.0" }`, keywords/classifiers/`Issues` URL; `src/agentharness/__init__.py` `__version__`; `src/agentharness/py.typed`; `.github/workflows/release.yml` (tags `v*.*.*` / `v*.*.*a*`, `twine upload` via `PYPI_API_TOKEN`).
 
----
 
 ## 2026-04-19 — Replay mode (interceptor, runner, CLI)
 
@@ -34,13 +41,11 @@ Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an in
 
 **What shipped:** `InterceptMode.REPLAY`, `ReplayCassetteError`, `HarnessInterceptor(..., cassette=)`; `run_scenario(..., mode="replay", cassette_path=)`; `verify_replay_determinism()`; `agentharness run --replay`; tests `tests/unit/test_replay.py`.
 
----
 
 ## 2026-04-19 — PROJECT_CONTEXT sprint tables (owner labels)
 
 Owner labels normalized to Founder throughout sprint tables; artifact scan clean.
 
----
 
 ## 2026-04-19 — cli/record.py (`agentharness record`)
 
@@ -48,7 +53,6 @@ Owner labels normalized to Founder throughout sprint tables; artifact scan clean
 
 **What shipped:** `record_command` (`--output`, `--mode` live/mock, `--allow-real-tools`, `--allow-sensitive-recording`); `core/runner.py` optional `mode` override; `RunResult.tool_call_records`; `tests/unit/test_cli_record.py`.
 
----
 
 ## 2026-04-19 — mocks/cassette.py (KI-002, KI-006)
 
@@ -56,7 +60,6 @@ Owner labels normalized to Founder throughout sprint tables; artifact scan clean
 
 **What shipped:** Cassette, CassetteEntry, make_cassette_key, sanitize, save/load/lookup, default_cassette_path; `tests/unit/test_cassette.py`; `CHANGELOG.md` [Unreleased].
 
----
 
 ## 2026-04-19 — Telemetry `TraceCollector` (Phase 1 Checkpoint 1)
 
@@ -64,7 +67,6 @@ Owner labels normalized to Founder throughout sprint tables; artifact scan clean
 
 **What shipped:** `TraceCollector` records `ToolCallRecord` rows as OpenInference-aligned TOOL spans; `core/runner.py` and `examples/01_customer_support_langgraph/support/executor.py` wrap `HarnessInterceptor.record_call` to feed the collector; `support/trace_builder.py` stubbed; `tests/unit/test_collector.py`; `telemetry/__init__.py` documents direct import (with `jsonl`). `CHANGELOG.md` [Unreleased]; Ruff `extend-exclude` lists `assertions` and `adapters` only so `telemetry/` is linted.
 
----
 
 ## 2026-04-19 — `.gitattributes` + LF renormalization
 
@@ -72,7 +74,6 @@ Owner labels normalized to Founder throughout sprint tables; artifact scan clean
 
 **What shipped:** `.gitattributes` at repo root; `git add --renormalize .` applied; `CHANGELOG.md` updated.
 
----
 
 ## 2026-04-19 — Phase 1 Checkpoint 1: `.editorconfig`, Ruff, CI lint
 
@@ -80,19 +81,16 @@ Owner labels normalized to Founder throughout sprint tables; artifact scan clean
 
 **What shipped:** Root `.editorconfig`; `pyproject.toml` — `ruff>=0.4.0`, `[tool.ruff]` (line-length 88, `extend-exclude` for assertions/adapters/telemetry), `[tool.ruff.lint]` (E/F/W/I, ignore `E501`), `[tool.ruff.format]`; Ruff auto-fix + format on allowed `src/` paths; `.github/workflows/ci.yml` — new `lint` job (Python 3.12, `pip install -e ".[dev]"`, `ruff check` / `ruff format --check`).
 
----
 
 ## 2026-04-19 — Phase 1 Checkpoint 1: sprint plan + status
 
 **Added / updated in `PROJECT_CONTEXT.md`:** **CURRENT STATUS** set to Phase 1 MVP, Checkpoint 1 of 3, no blockers, Last Updated April 2026 (week/start/target lines removed). **What We Are Building Right Now:** struck “Next: telemetry collector wiring…”; replaced with Phase 1 Checkpoint 1 priorities (collector, cassette pipeline, regression diff, 0.1.0-alpha). New **PHASE 1 SPRINT PLAN** after **PHASE 1 BACKLOG**: Checkpoint 1 table (`.editorconfig`/ruff, `telemetry/collector.py`, `mocks/cassette.py`, `cli/record.py`, replay mode, `reporting/diff.py`, example 01, PyPI alpha), exit criteria, and stub for Checkpoints 2–3. **PHASE 1 BACKLOG:** items 1–3 struck with **Checkpoint 1** notes.
 
----
 
 ## 2026-04-19 — UTF-16 warning list: `README.md` + `CHANGELOG.md`
 
 **Added / updated in `PROJECT_CONTEXT.md`:** Under **CONTRIBUTION PROCESS → Windows: UTF-8 for `.py` files**, the list of files affected by UTF-16 save issues now includes `README.md` and `CHANGELOG.md` (confirmed on this machine during Phase 0 close-out: `__main__.py` + README/CHANGELOG edits). Added a short note that repo Markdown is not exempt and that the same UTF-16 LE pattern and UTF-8 re-save fix apply.
 
----
 
 ## 2026-04-19 — Phase 0 exit review (complete)
 
@@ -100,7 +98,6 @@ Owner labels normalized to Founder throughout sprint tables; artifact scan clean
 
 **What was verified:** Sprint 1 exit (pytest + `assert_called_before` + `@scenario`/`run`); `examples/01_customer_support_langgraph/` (5/5), full `tests/unit/` (67/67), `agentharness run scenarios/safety/refund_limit_guard.yaml` (pass/fail summary), CI matrix (3.10–3.12, editable install, unit pytest), AD-002 fallback + `test_langgraph_intercept.py`, README roadmap text-only (no `Founder_Docs/` link), regression slices for structural/argument/safety/resource/trace/console/cli/plugin/intercept tests, `mypy` clean on listed packages after fixing `Span.status_code` default in `core/trace.py` (literal `"UNSET"`).
 
----
 
 ## 2026-04-19 — Root README + Sprint 2 README task
 
@@ -108,7 +105,6 @@ Owner labels normalized to Founder throughout sprint tables; artifact scan clean
 
 **What shipped:** Repository root `README.md` (install commands aligned with `pyproject.toml`, quickstart via `examples/01_customer_support_langgraph/`, assertion table from `REFS_*`, CLI usage, roadmap link to `Founder_Docs/project_proposal.md`).
 
----
 
 ## 2026-04-19 — Phase 0 example 01 (customer support LangGraph)
 
@@ -116,7 +112,6 @@ Owner labels normalized to Founder throughout sprint tables; artifact scan clean
 
 **What shipped:** `examples/01_customer_support_langgraph/` with mock LangGraph tool execution, YAML `steps`, five scenario files, `test_refund_agent.py`, and README.
 
----
 
 ## 2026-04-19 — KI-007 / AD-011 — `finish()` result collection (CLI vs pytest)
 
@@ -124,4 +119,3 @@ Owner labels normalized to Founder throughout sprint tables; artifact scan clean
 
 **What shipped:** `assertions/base.py` appends to the optional collector inside `finish()` before raising; `cli/run.py` binds a list for `agentharness run`; `pytest_plugin.py` documents that pytest continues to use stash + `LOGREPORT_PENDING` without requiring the ContextVar.
 
----

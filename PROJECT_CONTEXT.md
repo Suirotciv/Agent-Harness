@@ -5,7 +5,6 @@
 > **How to use this file:**
 > This is the single source of truth for anyone working on Agent-Harness. It is the first file you read before touching code and the last file you update before closing a PR. It does not replace the full proposal (project_proposal.md) or the roadmap -- it is the working layer on top of them. When you discover something important -- an architectural decision, a constraint, a lesson, a changed assumption -- you write it here. This file should make any engineer productive in 30 minutes regardless of how long they've been away from the project.
 
----
 
 ## Document change policy
 
@@ -15,7 +14,6 @@
 2. When a change is **too large** for readable inline strike-through (multi-paragraph sections, whole table snapshots), add a dated entry to [project_context_revisions.md](project_context_revisions.md) with the **full prior text** and a short note on what replaced it.
 3. Every substantive edit to this file should add a **newest-first** entry to `project_context_revisions.md`.
 
----
 
 ## CURRENT STATUS
 
@@ -37,7 +35,6 @@ The tool intercept layer and basic trace schema. The first slice of interception
 2. ~~Define the Span schema (see Architecture Decisions below)~~ **Done** -- `core/trace.py`, `telemetry/schema.py`; ~~next: implement `telemetry/collector.py` and connect `ToolCallRecord` → `Span`.~~ **Done** — `telemetry/collector.py` (`TraceCollector`).
 3. **Done** — `assert_called_before` plus `tests/unit/test_assert_called_before.py` (trace spans, interceptor `ToolCallRecord` list, ordered name lists).
 
----
 
 ## WHAT WE ARE BUILDING
 
@@ -54,13 +51,11 @@ Engineering teams can observe what their agent did (via tracing tools like LangF
 - Not an LLM benchmark (not SWE-bench or WebArena)
 - Not a replacement for LangSmith, DeepEval, or TruLens -- it is complementary, focusing on the behavioral testing layer they do not fully cover
 
----
 
 ## ARCHITECTURE DECISIONS
 
 > All major decisions are logged here with reasoning. Never change these without updating this entry. If you disagree with a decision, open an RFC -- don't silently change behavior.
 
----
 
 ### AD-001: `src` layout for Python packaging
 **Date:** Project start
@@ -68,7 +63,6 @@ Engineering teams can observe what their agent did (via tracing tools like LangF
 **Why:** Prevents editable-install import confusion, enforces that tests actually import from the installed package not the local directory, standard for PyPI-distributed packages as of 2024. hatch, flit, and setuptools all handle it cleanly.
 **Trade-off:** Slightly unfamiliar to engineers used to flat layouts. Minor.
 
----
 
 ### AD-002: Tool intercept via wrapper, not monkey-patching
 
@@ -98,7 +92,6 @@ def wrap_tool(real_fn, recorder):
 ```
 **Trade-off:** Each adapter must implement correct wiring. OpenAI / Anthropic / CrewAI will not use `ToolNode`; they get their own adapter modules. We test each adapter independently.
 
----
 
 ### AD-003: OpenInference-compatible trace schema, not proprietary
 **Date:** Phase 0
@@ -118,7 +111,6 @@ def wrap_tool(real_fn, recorder):
 ```
 **Full schema:** see `src/agentharness/telemetry/schema.py`
 
----
 
 ### AD-004: Pytest as the primary runner
 **Date:** Phase 0
@@ -136,7 +128,6 @@ def test_refund_happy_path(run):
 *(Phase 0: `run` is wired; `assert_arg_lte` and full scenario YAML execution are Sprint 2+ unless noted elsewhere.)*
 **Trade-off:** Users who don't use pytest need to use the CLI runner instead. Acceptable -- CLI is also supported.
 
----
 
 ### AD-005: Mock mode is always the default, cassettes are sanitized by default
 **Date:** Phase 0
@@ -144,14 +135,12 @@ def test_refund_happy_path(run):
 **Why:** A test that accidentally emails a real customer, charges a real card, or deletes a real database record is a catastrophic failure. Safe by default is non-negotiable. The friction of opting into live mode is intentional. Similarly, cassettes that are intended for version control must be sanitized to prevent committing sensitive data.
 **How it works:** The Environment object checks mode before every tool execution. If mode is `mock` and no mock response is configured for the called tool, it raises `MockNotConfiguredError` rather than calling the real function. This is a loud failure, not a silent pass-through. Cassette save path runs through the sanitization pipeline (secret scrubbing always on, PII scrubbing on by default) before writing. Use `--allow-sensitive-recording` to bypass PII scrubbing with a CLI warning.
 
----
 
 ### AD-006: Apache 2.0 license
 **Date:** Project start
 **Decision:** Apache 2.0.
 **Why:** Enterprise-friendly (explicit patent grant), OSI-approved, compatible with MIT and other Apache libraries we depend on (OpenInference, OTel). Does not restrict commercial use. Does not require commercial users to open-source their derivative works. BSL and AGPL were considered and rejected -- both create community trust problems for a framework trying to be the neutral player.
 
----
 
 ### AD-007: Python 3.10+ minimum version
 **Date:** Phase 0
@@ -159,7 +148,6 @@ def test_refund_happy_path(run):
 **Why:** 3.10 brings match/case (used for trace event routing), 3.10+ has better type hint syntax. 3.9 EOL is October 2025. Most agent framework dependencies (LangGraph 0.3+, CrewAI 0.9+) also require 3.10+.
 **Trade-off:** Excludes users on 3.9. Acceptable given the target audience is teams actively building production agents in 2026.
 
----
 
 ### AD-008: Local-first trace storage, optional backend export
 **Date:** Phase 0
@@ -168,7 +156,6 @@ def test_refund_happy_path(run):
 **Storage path:** `.agentharness/traces/YYYY-MM-DD/scenario_name_TIMESTAMP.jsonl`
 **Note:** `.agentharness/` should be in `.gitignore` unless users explicitly want to commit traces (cassettes, which are smaller, deterministic, and sanitized, can be committed).
 
----
 
 ### AD-009: Approval gate binding with structured artifacts
 **Date:** Phase 0
@@ -176,7 +163,6 @@ def test_refund_happy_path(run):
 **Why:** `approval_before_destructive()` is necessary but not sufficient if the approval artifact is unbounded. An "approve_refund" decision in one concurrent run should not inadvertently authorize a different refund in another run. Binding the approval to the specific tool call's args hash and run ID prevents cross-run authorization leakage.
 **Trade-off:** Slightly more complex approval gate implementation. Worth it for correctness in concurrent/multi-agent scenarios.
 
----
 
 ### AD-010: Emergency stop operates at three defined tiers
 **Date:** Phase 0
@@ -187,7 +173,6 @@ def test_refund_happy_path(run):
 
 **Why:** "Emergency stop within 500ms" cannot be guaranteed universally. An in-flight HTTP call already dispatched to an external API cannot be recalled. Defining three tiers with explicit guarantees prevents overclaiming. SIGKILL cannot be caught and there is no rollback after SIGKILL -- ABORT mode is best-effort checkpoint, not rollback.
 
----
 
 ### AD-011: Harness assertions return `AssertionResult` (compliance-oriented, pytest-compatible)
 **Date:** April 2026
@@ -195,7 +180,6 @@ def test_refund_happy_path(run):
 **Why:** Future console reporters and PDF/HTML evidence generators need structured outcomes plus citeable regulatory anchors without re-parsing exception strings. Test authors still get immediate failures in CI. `details` holds tool names, observed call order, numeric bounds, and short `constraint` descriptions so formatters do not import assertion module internals.
 **Trade-off:** Callers must tolerate a return value instead of `None`; type hints now return `AssertionResult`. Downstream IDEs and composable test helpers can consume the record intentionally.
 
----
 
 ## INTEGRATIONS & DEPENDENCIES
 
@@ -232,7 +216,6 @@ pip install -e ".[langgraph,dev]"                 # Local dev: LangGraph + async
 pip install "agentharness[all]"                   # Everything (includes dev extra)
 ```
 
----
 
 ### OSS Repos We Incorporate
 
@@ -250,7 +233,6 @@ pip install "agentharness[all]"                   # Everything (includes dev ext
 
 **Clean room rule:** If we borrow patterns (not code), implement fresh. If we incorporate (use actual code), use as a direct dependency or fork under its original license terms. Never copy code and remove attribution.
 
----
 
 ## KEY FILE LOCATIONS
 
@@ -281,7 +263,6 @@ docs/compliance/colorado_sb24_205.md    -> Colorado SB 24-205 compliance guide
 pyproject.toml                          -> All dependencies and tool configuration
 ```
 
----
 
 ## KNOWN ISSUES & TECHNICAL DEBT
 
@@ -297,7 +278,6 @@ pyproject.toml                          -> All dependencies and tool configurati
 | KI-006 | ~~Cassette sanitization must be default-on for PII/secrets before version-control commit~~ | MEDIUM | **RESOLVED** | **Now:** `sanitize` + `save()` in `mocks/cassette.py` (AD-005: secret scrubbing cannot be disabled; PII scrubbing default-on via `Cassette.pii_scrubbed`; `--allow-sensitive-recording` reserved for CLI). |
 | KI-007 | ~~`cli/run.py` per-module `finish()` patching violated AD-011 and would silently miss results from `argument.py`, `safety.py`, `resource.py`~~ | HIGH | **RESOLVED** | Fixed by `_results_collector` `ContextVar` in `assertions/base.py` with `set_results_collector` / `reset_results_collector`; `finish()` appends before raise; CLI binds the list for scenario assertions; pytest uses stash only (documented on `pytest_plugin.py`). |
 
----
 
 ## PHASE 0 SPRINT PLAN
 
@@ -330,7 +310,6 @@ def test_lookup_called_before_refund(run):
 
 **Evidence:** `tests/unit/test_sprint1_exit_criteria.py` matches this snippet and is part of `pytest tests/unit/` (CI). `scenarios/refund_happy_path.yaml` declares `tool_calls`; `run_scenario()` in `core/runner.py` loads YAML and records synthetic tool calls via `HarnessInterceptor.record_call` → `TraceCollector` in that order.
 
----
 
 ### Sprint 2: Phase 0 Completion
 
@@ -357,7 +336,6 @@ def test_lookup_called_before_refund(run):
 - `pip install agentharness` works locally (no PyPI publish yet -- local install only)
 - Fallback architecture plan documented
 
----
 
 ## PHASE 1 BACKLOG (Not Yet Scheduled)
 
@@ -376,7 +354,6 @@ Items confirmed for Phase 1 but not yet sprint-planned. Ordering reflects priori
 11. Documentation site (mkdocs + GitHub Pages)
 12. Public launch (HN, Discord, blog post)
 
----
 
 ## PHASE 1 SPRINT PLAN
 
@@ -409,7 +386,6 @@ Items confirmed for Phase 1 but not yet sprint-planned. Ordering reflects priori
 
 Not yet sprint-planned. See PHASE 1 BACKLOG for confirmed items.
 
----
 
 ## DOMAIN KNOWLEDGE
 
@@ -483,7 +459,6 @@ The OpenAI Assistants API was deprecated on August 26, 2025, with full shutdown 
 - Response objects have a 30-day TTL
 Our Phase 1 OpenAI adapter targets the Responses API as the primary interface. Legacy Assistants API support is available as a migration path only.
 
----
 
 ## SECURITY & SECRETS
 
@@ -502,7 +477,6 @@ Our Phase 1 OpenAI adapter targets the Responses API as the primary interface. L
 ### Security Disclosure
 Report vulnerabilities via SECURITY.md instructions. Include: disclosure policy, security contact email, expected response timeline (target: 72 hours to acknowledge, 30 days to fix for critical vulnerabilities). Do not open public GitHub issues for security bugs.
 
----
 
 ## CONTRIBUTION PROCESS
 
@@ -553,7 +527,6 @@ See CONTRIBUTING.md. Short version: open an issue before writing code for large 
 - Is a single focused change (not "added three features and fixed four bugs")
 - Updates CHANGELOG.md
 
----
 
 ## METRICS WE TRACK
 
@@ -574,7 +547,6 @@ See CONTRIBUTING.md. Short version: open an issue before writing code for large 
 - Discord/GitHub issue sentiment
 - % of design partners who renew past pilot
 
----
 
 ## DECISION LOG
 
@@ -594,7 +566,6 @@ See CONTRIBUTING.md. Short version: open an issue before writing code for large 
 | April 2026 | OpenAI Responses API as primary target | Founder | Assistants API deprecated Aug 2025, shutdown Aug 2026. Responses API is the future. |
 | April 2026 | LangGraph `ToolNode.wrap_tool_call` / `awrap_tool_call` as primary intercept | Core team | Validated without patching LangGraph; AD-002 fallback (tool replacement) retained and tested. Evidence: `tests/unit/test_langgraph_intercept.py`. |
 
----
 
 ## LAUNCH CHECKLIST
 
@@ -631,7 +602,6 @@ See CONTRIBUTING.md. Short version: open an issue before writing code for large 
 - [ ] Social media thread ready to post same day as HN
 - [ ] LangChain Discord post written
 
----
 
 ## FUTURE WORK (Not Yet Committed)
 
@@ -646,7 +616,6 @@ See CONTRIBUTING.md. Short version: open an issue before writing code for large 
 - **Accessibility for web UI**: WCAG 2.1 AA compliance for Live Mode v2; documentation translations (EN/FR/DE minimum for EU audience)
 - **Migration guides**: "Moving from LangSmith / AgentOps to Agent-Harness" to onboard users with existing tooling
 
----
 
 *project_context.md -- Agent-Harness*
 *This file is living documentation. Update it continuously; preserve superseded wording per **Document change policy** and [project_context_revisions.md](project_context_revisions.md). The best documentation is the documentation that's actually true.*

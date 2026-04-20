@@ -2,7 +2,7 @@
 
 All notable changes to Agent-Harness will be documented in this file.
 
-## [0.1.0a2] -- 2026-04-20
+## [0.1.0a2] - 2026-04-20
 
 ### Summary
 
@@ -15,7 +15,7 @@ Documentation-only release: collaborator demo guide, embedded README screenshots
 - `PROJECT_CONTEXT.md`: `Last Release` and Checkpoint 1 exit criterion use `pytest-agentharness==0.1.0a2`.
 - `pyproject.toml` / `src/agentharness/__init__.py`: version **0.1.0a2**.
 
-## [0.1.0a1] -- 2026-04-19
+## [0.1.0a1] - 2026-04-19
 
 ### Summary
 
@@ -94,5 +94,6 @@ for LangGraph agents. Not yet recommended for production use.
 
 ## [Unreleased]
 
+- Remove Markdown horizontal-rule lines (`---`) from `PROJECT_CONTEXT.md` and `project_context_revisions.md`; `docs/index.html` uses heading spacing instead of `<hr>`.
 - `docs/index.html`: GitHub Pages landing page (single HTML file, no external dependencies); `docs/README.md` note for Pages source.
 
