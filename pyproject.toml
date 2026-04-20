@@ -8,7 +8,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agentharness"
+name = "pytest-agentharness"
 version = "0.1.0a1"
 description = "Open-source test harness for AI agents that take real-world actions."
 readme = "README.md"
@@ -47,12 +47,12 @@ dependencies = [
 ]
 
 # Optional extras: `tokencost` is pinned only under [resource]. [dev] pulls it in via
-# `agentharness[resource]` so the version cannot drift. types-* packages are for mypy;
+# `pytest-agentharness[resource]` so the version cannot drift. types-* packages are for mypy;
 # CI uses `pip install -e ".[langgraph,dev]"` (see .github/workflows/ci.yml), not [all].
 [project.optional-dependencies]
 resource = ["tokencost>=0.1"]
 dev = [
-    "agentharness[resource]",
+    "pytest-agentharness[resource]",
     "pytest-asyncio>=1.0",
     "types-jsonschema>=4.0",
     "types-PyYAML>=6.0",
@@ -67,7 +67,7 @@ compliance = ["jinja2", "weasyprint"]
 langfuse = ["langfuse"]
 arize = ["arize-phoenix", "openinference-semantic-conventions"]
 all = [
-    "agentharness[dev,langgraph,openai,anthropic,crewai,live,compliance,langfuse,arize]",
+    "pytest-agentharness[dev,langgraph,openai,anthropic,crewai,live,compliance,langfuse,arize]",
 ]
 
 [project.urls]
