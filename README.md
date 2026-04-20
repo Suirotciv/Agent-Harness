@@ -22,6 +22,14 @@ pip install -e ".[langgraph,dev]"
 
 `[dev]` includes `pytest-asyncio`, typing stubs, and pulls `[resource]` (`tokencost`) per `pyproject.toml`. Other extras: `[openai]`, `[anthropic]`, `[crewai]`, `[live]`, `[compliance]`, `[langfuse]`, `[arize]`, or `[all]`.
 
+**PyPI (alpha):** The published package is `pytest-agentharness`. To match CI and the LangGraph example:
+
+```bash
+pip install "pytest-agentharness[langgraph,dev]==0.1.0a1"
+```
+
+The GitHub repository name is **Agent-Harness**; the Python package import remains `agentharness`.
+
 ## Quickstart
 
 Behavioral checks use `@scenario`, the `run` fixture, and assertions on `run.trace`. For a trace that includes tool arguments (not only tool names), run the bundled LangGraph example test from the repo root:
@@ -82,13 +90,26 @@ python -m agentharness run <scenario.yaml>
 
 Optional `--mode mock|live` (default `mock`).
 
+## Demo and screenshots
+
+Agent-Harness is terminal-first (pytest + CLI)—there is no separate web UI to demo. Step-by-step commands and a short live script: [docs/demo.md](docs/demo.md).
+
+**Pytest** — example happy-path (`test_happy_path`):
+
+![Pytest happy path](docs/images/01-pytest-happy.png)
+
+**CLI** — `agentharness run` on the safety scenario (mock):
+
+![CLI pass](docs/images/02-cli-pass.png)
+
+**Replay + diff** — cassette comparison:
+
+![Replay and diff](docs/images/03-replay-diff.png)
+
 ## Roadmap
 
 Phase 0 (foundation, pytest plugin, assertions, LangGraph adapter,
-CLI `run`, example agent) is complete. Phase 1 adds record/replay,
-OpenAI and CrewAI adapters, multi-run statistical mode, and a PyPI
-release. A public roadmap will be published before the Phase 1
-launch.
+CLI `run`, example agent) is complete. **0.1.0a1** is on PyPI as an alpha (`pytest-agentharness`). Phase 1 continues with additional adapters (e.g. OpenAI, CrewAI), multi-run statistical mode, and follow-on releases. A fuller public roadmap is planned before the Phase 1 launch milestone.
 
 ## License
 

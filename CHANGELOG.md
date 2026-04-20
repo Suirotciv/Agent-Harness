@@ -81,5 +81,7 @@ for LangGraph agents. Not yet recommended for production use.
 
 ## [Unreleased]
 
+- README: embed `docs/images/` terminal screenshots under Demo and screenshots; `docs/demo.md` points to that section.
+- Add `docs/demo.md` (collaborator demo, PyPI pin, screenshot table) and `docs/images/` placeholder; link from `README.md`; cross-link `examples/04_record_replay_demo/README.md`.
 - pyproject.toml URLs corrected to https://github.com/Suirotciv/Agent-Harness; dist/ and *.egg-info/ added to .gitignore.
 
