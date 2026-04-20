@@ -4,6 +4,14 @@ Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an in
 
 ---
 
+## 2026-04-19 — Telemetry `TraceCollector` (Phase 1 Checkpoint 1)
+
+**Added / updated in `PROJECT_CONTEXT.md`:** Checkpoint 1 sprint rows **telemetry/collector.py** and **Update example 01 to use collector** marked **DONE**; KEY FILE LOCATIONS entry for `src/agentharness/telemetry/collector.py` (import from `agentharness.telemetry.collector`, not package root).
+
+**What shipped:** `TraceCollector` records `ToolCallRecord` rows as OpenInference-aligned TOOL spans; `core/runner.py` and `examples/01_customer_support_langgraph/support/executor.py` wrap `HarnessInterceptor.record_call` to feed the collector; `support/trace_builder.py` stubbed; `tests/unit/test_collector.py`; `telemetry/__init__.py` documents direct import (with `jsonl`). `CHANGELOG.md` [Unreleased]; Ruff `extend-exclude` lists `assertions` and `adapters` only so `telemetry/` is linted.
+
+---
+
 ## 2026-04-19 — `.gitattributes` + LF renormalization
 
 **Added / updated in `PROJECT_CONTEXT.md`:** Sprint table row **.gitattributes + LF normalization** (first row, **DONE**): notes repo-wide LF via `.gitattributes`, `git add --renormalize .`, Windows CRLF warning mitigation; marked as infrastructure add-on before collector work.

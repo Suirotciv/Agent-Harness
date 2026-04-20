@@ -29,11 +29,11 @@ Last Updated: April 2026
 ### What We Are Building Right Now
 ~~The tool intercept layer and basic trace schema. Everything else depends on getting this right. If tool calls cannot be reliably intercepted and recorded -- for both sync and async callables -- without modifying the agent's source code, the rest of the project does not work.~~
 
-The tool intercept layer and basic trace schema. The first slice of interception is implemented and tested for LangGraph (native `ToolNode` hooks plus AD-002 fallback; sync and async; mock and live). ~~Next: formal `Span` / `Trace` models,~~ `Span` / `Trace` Pydantic models and OpenInference-aligned attribute keys are in `core/trace.py` and `telemetry/schema.py`. `assert_called_before` is implemented in `assertions/structural.py` (see Sprint 1 table). Trace JSONL serialization is in `telemetry/jsonl.py` (AD-008; import from `agentharness.telemetry.jsonl`). **Assertions API:** every public harness assertion returns an `AssertionResult` (`assertions/base.py`) with `regulatory_refs` (mapped via `REFS_*` constants to EU AI Act, NIST AI RMF TEVV, Colorado SB 24-205, OWASP LLM citations) and a `details` dict for reporters; `finish()` raises `AssertionError` on failure so pytest behavior is unchanged (AD-011). ~~Next: telemetry collector wiring from `ToolCallRecord` into spans.~~ Phase 1 Checkpoint 1 underway. Priority: `telemetry/collector.py` (ToolCallRecord → Span), cassette record/replay pipeline, regression diff, and 0.1.0-alpha PyPI release.
+The tool intercept layer and basic trace schema. The first slice of interception is implemented and tested for LangGraph (native `ToolNode` hooks plus AD-002 fallback; sync and async; mock and live). ~~Next: formal `Span` / `Trace` models,~~ `Span` / `Trace` Pydantic models and OpenInference-aligned attribute keys are in `core/trace.py` and `telemetry/schema.py`. `assert_called_before` is implemented in `assertions/structural.py` (see Sprint 1 table). Trace JSONL serialization is in `telemetry/jsonl.py` (AD-008; import from `agentharness.telemetry.jsonl`). **Assertions API:** every public harness assertion returns an `AssertionResult` (`assertions/base.py`) with `regulatory_refs` (mapped via `REFS_*` constants to EU AI Act, NIST AI RMF TEVV, Colorado SB 24-205, OWASP LLM citations) and a `details` dict for reporters; `finish()` raises `AssertionError` on failure so pytest behavior is unchanged (AD-011). ~~Next: telemetry collector wiring from `ToolCallRecord` into spans.~~ Phase 1 Checkpoint 1 underway. ~~Priority: `telemetry/collector.py` (ToolCallRecord → Span),~~ `TraceCollector` is implemented (`telemetry/collector.py`; import from `agentharness.telemetry.collector`). Next priorities: cassette record/replay pipeline, regression diff, and 0.1.0-alpha PyPI release.
 
 ### This Week's Priority
 1. ~~Validate that LangGraph's `ToolNode` can be wrapped without patching LangGraph internals (sync and async)~~ **Done** -- see `tests/unit/test_langgraph_intercept.py` and DOMAIN KNOWLEDGE / LangGraph discovery below.
-2. ~~Define the Span schema (see Architecture Decisions below)~~ **Done** -- `core/trace.py`, `telemetry/schema.py`; next: implement `telemetry/collector.py` and connect `ToolCallRecord` → `Span`.
+2. ~~Define the Span schema (see Architecture Decisions below)~~ **Done** -- `core/trace.py`, `telemetry/schema.py`; ~~next: implement `telemetry/collector.py` and connect `ToolCallRecord` → `Span`.~~ **Done** — `telemetry/collector.py` (`TraceCollector`).
 3. **Done** — `assert_called_before` plus `tests/unit/test_assert_called_before.py` (trace spans, interceptor `ToolCallRecord` list, ordered name lists).
 
 ---
@@ -266,6 +266,7 @@ src/agentharness/reporting/console.py  -> ConsoleReporter; formats AssertionResu
 src/agentharness/cli/run.py            -> `agentharness run` subcommand; loads scenario YAML, runs via `core/runner.py`, formats output via `ConsoleReporter`
 src/agentharness/scenario.py            -> `@scenario` decorator (AD-004)
 src/agentharness/telemetry/jsonl.py -> Trace JSONL read/write (AD-008); import from `telemetry.jsonl`, not `telemetry` package root
+src/agentharness/telemetry/collector.py -> TraceCollector; converts ToolCallRecord → Span → Trace; import from `agentharness.telemetry.collector` not package root
 tests/unit/test_langgraph_intercept.py  -> Proof that ToolNode interception works (sync/async, both strategies)
 examples/01_customer_support_langgraph/ -> Phase 0 LangGraph refund example (5 YAML scenarios, mock tools, `support/executor.py`); must always run cleanly with `pytest`
 scenarios/safety/                       -> Built-in safety scenarios; free for community to use
@@ -322,7 +323,7 @@ def test_lookup_called_before_refund(run):
     assert_called_before(run.trace, "lookup_order", "issue_refund")
 ```
 
-**Evidence:** `tests/unit/test_sprint1_exit_criteria.py` matches this snippet and is part of `pytest tests/unit/` (CI). `scenarios/refund_happy_path.yaml` declares `tool_calls`; `run_scenario()` in `core/runner.py` loads YAML and appends synthetic TOOL spans in that order (Phase 0 stand-in until LangGraph execution + `ToolCallRecord` → span collector wiring lands).
+**Evidence:** `tests/unit/test_sprint1_exit_criteria.py` matches this snippet and is part of `pytest tests/unit/` (CI). `scenarios/refund_happy_path.yaml` declares `tool_calls`; `run_scenario()` in `core/runner.py` loads YAML and records synthetic tool calls via `HarnessInterceptor.record_call` → `TraceCollector` in that order.
 
 ---
 
@@ -381,13 +382,13 @@ Items confirmed for Phase 1 but not yet sprint-planned. Ordering reflects priori
 | Task | Owner | Status | Notes |
 |---|---|---|---|
 | .gitattributes + LF normalization | Engineer 2 | **DONE** | Enforces LF repo-wide via `.gitattributes`; `git add --renormalize .` applied; resolves LF→CRLF Git warnings on Windows. *(Infrastructure add-on before collector work; not in original sprint plan.)* |
-| .editorconfig + ruff in CI | Engineer 2 | **DONE** | Root `.editorconfig` (UTF-8, LF, trim rules; `.md` no trim); `[dev]` + `ruff>=0.4.0`; `[tool.ruff]` line-length 88, lint E/F/W/I (E501 ignored until docstring wrap); `[tool.ruff.format]`; parallel `lint` job in `ci.yml` (`pip install -e ".[dev]"`, `ruff check` / `ruff format --check` on `src/`). Assertions/adapters/telemetry excluded from ruff until scheduled. |
-| telemetry/collector.py | Engineer 1 | TODO | Wire ToolCallRecord → Span; replaces trace_builder.py stand-in in example 01 |
+| .editorconfig + ruff in CI | Engineer 2 | **DONE** | Root `.editorconfig` (UTF-8, LF, trim rules; `.md` no trim); `[dev]` + `ruff>=0.4.0`; `[tool.ruff]` line-length 88, lint E/F/W/I (E501 ignored until docstring wrap); `[tool.ruff.format]`; parallel `lint` job in `ci.yml` (`pip install -e ".[dev]"`, `ruff check` / `ruff format --check` on `src/`). `extend-exclude`: `assertions` + `adapters` only (`telemetry/collector.py` linted). |
+| telemetry/collector.py | Engineer 1 | **DONE** | `TraceCollector` in `telemetry/collector.py`; `record()` → TOOL spans (`tool.name`, `input.value`, `output.value`); `core/runner.py` + example `executor.py` wire `HarnessInterceptor.record_call` → collector; tests `tests/unit/test_collector.py` |
 | mocks/cassette.py | Engineer 1 | TODO | Cassette read/write; sha256(tool_name + sorted_args_json) key per DOMAIN KNOWLEDGE; secret scrubbing always on, PII scrubbing default per AD-005; closes KI-002 and KI-006 |
 | cli/record.py — agentharness record | Engineer 1 | TODO | Live run → sanitized cassette; --allow-sensitive-recording flag per AD-005 |
 | Replay mode — agentharness run --replay | Engineer 2 | TODO | Deterministic re-run from cassette; zero variance across 10 runs of same cassette |
 | reporting/diff.py — regression diff | Engineer 2 | TODO | Structural diff between two traces; human-readable output per reporting/ pattern |
-| Update example 01 to use collector | Engineer 1 | TODO | Replace support/trace_builder.py with telemetry/collector.py once collector lands |
+| Update example 01 to use collector | Engineer 1 | **DONE** | `support/executor.py` uses `TraceCollector`; `trace_builder.py` stubbed (replaced by collector) |
 | PyPI 0.1.0-alpha prep | Both | TODO | Version bump in pyproject.toml; confirm pip install agentharness==0.1.0a1 works from PyPI |
 
 **Checkpoint 1 Exit Criteria:**

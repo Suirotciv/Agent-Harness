@@ -5,8 +5,10 @@ All notable changes to AgentHarness will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- `src/agentharness/telemetry/collector.py`: `TraceCollector` (ToolCallRecord → OpenInference TOOL spans with tool.name, input.value, output.value); `core/runner.py` and `examples/01_customer_support_langgraph/support/executor.py` wrap `HarnessInterceptor.record_call` to feed the collector; `support/trace_builder.py` stubbed; `tests/unit/test_collector.py`. Ruff `extend-exclude` narrowed to `assertions` and `adapters` only so `telemetry/` is linted.
+
 - Root `.gitattributes` (`* text=auto eol=lf`, per-extension rules, binary globs); `git add --renormalize .` to apply LF to tracked files and reduce CRLF/LF churn on Windows.
-- Root `.editorconfig` (UTF-8, LF, trim; `*.md` has `trim_trailing_whitespace = false`); `ruff>=0.4.0` in `[dev]`; `[tool.ruff]` / `[tool.ruff.lint]` (E/F/W/I; `E501` ignored until docstring line wrap) / `[tool.ruff.format]`; `extend-exclude` for `assertions` / `adapters` / `telemetry` until those packages are reformatted on schedule. CI: parallel `lint` job (Python 3.12, `pip install -e ".[dev]"`, `python -m ruff check src/`, `python -m ruff format --check src/`).
+- Root `.editorconfig` (UTF-8, LF, trim; `*.md` has `trim_trailing_whitespace = false`); `ruff>=0.4.0` in `[dev]`; `[tool.ruff]` / `[tool.ruff.lint]` (E/F/W/I; `E501` ignored until docstring line wrap) / `[tool.ruff.format]`; `extend-exclude` for `assertions` / `adapters` until those packages are reformatted on schedule. CI: parallel `lint` job (Python 3.12, `pip install -e ".[dev]"`, `python -m ruff check src/`, `python -m ruff format --check src/`).
 - `agentharness/__main__.py` and `agentharness/cli/__main__.py`: run the CLI via `python -m agentharness …` or `python -m agentharness.cli …` (same `cli()` entry as the `agentharness` console script).
 
 ### Changed

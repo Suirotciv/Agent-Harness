@@ -11,11 +11,11 @@ from langgraph.runtime import Runtime
 from agentharness.adapters.langgraph import create_intercepted_tool_node
 from agentharness.core.result import RunResult
 from agentharness.core.runner import run_scenario
-from agentharness.mocks.interceptor import HarnessInterceptor, InterceptMode
+from agentharness.mocks.interceptor import HarnessInterceptor, InterceptMode, ToolCallRecord
 from agentharness.telemetry import schema as S
+from agentharness.telemetry.collector import TraceCollector
 
 from .refund_tools import ALL_REFUND_TOOLS
-from .trace_builder import tool_records_to_trace
 
 
 def _runtime_config() -> dict[str, Any]:
@@ -66,6 +66,21 @@ def run_example_scenario(scenario_path: str | Path) -> RunResult:
         mode=InterceptMode.MOCK,
         mock_responses=mocks,
     )
+
+    scenario_id = data.get("scenario_id")
+    if not isinstance(scenario_id, str) or not scenario_id.strip():
+        scenario_id = path.as_posix()
+
+    collector = TraceCollector(scenario_id=scenario_id, mode="mock", seed=None)
+    orig = interceptor.record_call
+
+    def wrapped(*args: Any, **kwargs: Any) -> ToolCallRecord:
+        rec = orig(*args, **kwargs)
+        collector.record(rec)
+        return rec
+
+    interceptor.record_call = wrapped  # type: ignore[method-assign]
+
     tool_node = create_intercepted_tool_node(ALL_REFUND_TOOLS, interceptor)
     cfg = _runtime_config()
 
@@ -80,10 +95,6 @@ def run_example_scenario(scenario_path: str | Path) -> RunResult:
             raise ValueError(f"steps[{i}].args must be a mapping when present")
         tool_node.invoke(_tool_call(name, args, f"call_{i}"), config=cfg)
 
-    scenario_id = data.get("scenario_id")
-    if not isinstance(scenario_id, str) or not scenario_id.strip():
-        scenario_id = path.as_posix()
-
-    trace = tool_records_to_trace(interceptor.calls, scenario_id=scenario_id)
+    trace = collector.build()
     trace.attributes[S.HARNESS_MODE] = "mock"
     return RunResult(trace=trace, scenario_path=path.as_posix())
