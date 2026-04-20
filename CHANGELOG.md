@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to AgentHarness will be documented in this file.
+All notable changes to Agent-Harness will be documented in this file.
 
 ## [0.1.0a1] -- 2026-04-19
 
@@ -81,5 +81,5 @@ for LangGraph agents. Not yet recommended for production use.
 
 ## [Unreleased]
 
-- pyproject.toml URLs corrected to https://github.com/Suirotciv/AGENTHARNESS; dist/ and *.egg-info/ added to .gitignore.
+- pyproject.toml URLs corrected to https://github.com/Suirotciv/Agent-Harness; dist/ and *.egg-info/ added to .gitignore.
 

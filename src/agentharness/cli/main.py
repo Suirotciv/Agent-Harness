@@ -16,7 +16,7 @@ def _stub(_args: argparse.Namespace) -> int:
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="agentharness",
-        description="AgentHarness — behavioral testing for AI agents (Phase 0 CLI).",
+        description="Agent-Harness — behavioral testing for AI agents (Phase 0 CLI).",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 

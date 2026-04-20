@@ -1,4 +1,4 @@
-"""AgentHarness -- open-source test harness for AI agents that take real-world actions."""
+"""Agent-Harness -- open-source test harness for AI agents that take real-world actions."""
 
 __version__ = "0.1.0a1"
 

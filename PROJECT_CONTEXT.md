@@ -1,9 +1,9 @@
 # project_context.md
-## AgentHarness -- Project Intelligence & Working Context
+## Agent-Harness -- Project Intelligence & Working Context
 ### Living Document -- Last Updated: April 2026 (Phase 0 exit review complete)
 
 > **How to use this file:**
-> This is the single source of truth for anyone working on AgentHarness. It is the first file you read before touching code and the last file you update before closing a PR. It does not replace the full proposal (project_proposal.md) or the roadmap -- it is the working layer on top of them. When you discover something important -- an architectural decision, a constraint, a lesson, a changed assumption -- you write it here. This file should make any engineer productive in 30 minutes regardless of how long they've been away from the project.
+> This is the single source of truth for anyone working on Agent-Harness. It is the first file you read before touching code and the last file you update before closing a PR. It does not replace the full proposal (project_proposal.md) or the roadmap -- it is the working layer on top of them. When you discover something important -- an architectural decision, a constraint, a lesson, a changed assumption -- you write it here. This file should make any engineer productive in 30 minutes regardless of how long they've been away from the project.
 
 ---
 
@@ -42,7 +42,7 @@ The tool intercept layer and basic trace schema. The first slice of interception
 ## WHAT WE ARE BUILDING
 
 ### One-Sentence Description
-AgentHarness is an open-source test harness for AI agents that take real-world actions -- it lets engineering teams write behavioral tests for agents, run those tests in CI, and generate compliance evidence, all without calling real APIs.
+Agent-Harness is an open-source test harness for AI agents that take real-world actions -- it lets engineering teams write behavioral tests for agents, run those tests in CI, and generate compliance evidence, all without calling real APIs.
 
 ### The Core Problem It Solves
 Engineering teams can observe what their agent did (via tracing tools like LangFuse and Arize Phoenix) and score what their agent said (via evaluation tools like LangSmith and DeepEval). No single open-source, framework-agnostic tool lets them assert that their agent *did the right things in the right order* -- with deterministic record/replay, fault injection, regression diffing, and compliance evidence generation -- as an automated CI test. We build that tool.
@@ -627,7 +627,7 @@ See CONTRIBUTING.md. Short version: open an issue before writing code for large 
 
 ### Launch Content
 - [ ] HN Show HN post drafted and reviewed
-- [ ] Blog post: "Why we built AgentHarness" published
+- [ ] Blog post: "Why we built Agent-Harness" published
 - [ ] Social media thread ready to post same day as HN
 - [ ] LangChain Discord post written
 
@@ -644,9 +644,9 @@ See CONTRIBUTING.md. Short version: open an issue before writing code for large 
 - **Natural language scenario authoring**: "Test that the refund agent never refunds more than the original order amount" -- auto-generates YAML scenario
 - **ISO/IEC 42001 full AI Management System template**: turnkey AI management system documentation generated from harness test results
 - **Accessibility for web UI**: WCAG 2.1 AA compliance for Live Mode v2; documentation translations (EN/FR/DE minimum for EU audience)
-- **Migration guides**: "Moving from LangSmith / AgentOps to AgentHarness" to onboard users with existing tooling
+- **Migration guides**: "Moving from LangSmith / AgentOps to Agent-Harness" to onboard users with existing tooling
 
 ---
 
-*project_context.md -- AgentHarness*
+*project_context.md -- Agent-Harness*
 *This file is living documentation. Update it continuously; preserve superseded wording per **Document change policy** and [project_context_revisions.md](project_context_revisions.md). The best documentation is the documentation that's actually true.*

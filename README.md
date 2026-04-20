@@ -1,10 +1,10 @@
-# AgentHarness
+# Agent-Harness
 
 Open-source test harness for AI agents that take real-world actions.
 
 ## Problem
 
-Teams can observe agents in traces and score outputs with existing tools, but they lack a shared, pytest-friendly way to assert the sequence of tool calls, arguments, and safety properties on a run. AgentHarness provides trace-oriented assertions and a CLI so those checks can run in CI without calling real APIs by default. It is complementary to observability and LLM evaluation stacks.
+Teams can observe agents in traces and score outputs with existing tools, but they lack a shared, pytest-friendly way to assert the sequence of tool calls, arguments, and safety properties on a run. Agent-Harness provides trace-oriented assertions and a CLI so those checks can run in CI without calling real APIs by default. It is complementary to observability and LLM evaluation stacks.
 
 ## Install
 
@@ -49,7 +49,7 @@ python -m pytest examples/01_customer_support_langgraph/test_refund_agent.py::te
 
 The example package overrides the `run` fixture so YAML `steps` execute under LangGraph with recorded args. More detail: [examples/01_customer_support_langgraph/README.md](examples/01_customer_support_langgraph/README.md).
 
-## What AgentHarness is not
+## What Agent-Harness is not
 
 - Not a monitoring or observability platform (use LangFuse or Arize Phoenix for that)
 - Not a full LLMOps platform

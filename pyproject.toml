@@ -1,4 +1,4 @@
-# AgentHarness -- pyproject.toml
+# Agent-Harness -- pyproject.toml
 # Project metadata, build configuration, and tool settings.
 # See: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
 
@@ -15,7 +15,7 @@ readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.10"
 authors = [
-    { name = "AgentHarness Contributors" },
+    { name = "Agent-Harness Contributors" },
 ]
 keywords = [
     "ai-agents",
@@ -71,9 +71,9 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Suirotciv/AGENTHARNESS"
-Repository = "https://github.com/Suirotciv/AGENTHARNESS"
-Issues = "https://github.com/Suirotciv/AGENTHARNESS/issues"
+Homepage = "https://github.com/Suirotciv/Agent-Harness"
+Repository = "https://github.com/Suirotciv/Agent-Harness"
+Issues = "https://github.com/Suirotciv/Agent-Harness/issues"
 
 [project.scripts]
 agentharness = "agentharness.cli.main:cli"

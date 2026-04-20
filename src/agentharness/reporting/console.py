@@ -101,8 +101,8 @@ class ConsoleReporter:
         *,
         configuration_errors: int = 0,
     ) -> str:
-        """One-line summary for pytest's terminal section, e.g. ``AgentHarness: 5 passed, 1 failed``."""
+        """One-line summary for pytest's terminal section, e.g. ``Agent-Harness: 5 passed, 1 failed``."""
         passed = sum(1 for r in results if r.passed)
         failed_assertions = sum(1 for r in results if not r.passed)
         failed = failed_assertions + configuration_errors
-        return f"AgentHarness: {passed} passed, {failed} failed"
+        return f"Agent-Harness: {passed} passed, {failed} failed"

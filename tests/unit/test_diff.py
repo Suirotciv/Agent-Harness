@@ -232,5 +232,5 @@ def test_cli_diff_after_summary(tmp_path: Path, capsys: pytest.CaptureFixture[st
     assert code == 0
     out = capsys.readouterr().out
     lines = [ln for ln in out.splitlines() if ln.strip()]
-    assert any("AgentHarness" in ln for ln in lines)
+    assert any("Agent-Harness" in ln for ln in lines)
     assert "Traces are equivalent." in out

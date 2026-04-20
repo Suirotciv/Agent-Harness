@@ -59,7 +59,7 @@ def test_summary_line_mixed() -> None:
     a = _result(passed=True)
     b = _result(passed=False, message="m")
     s = console_mod.ConsoleReporter.summary_line([a, b], configuration_errors=0)
-    assert s == "AgentHarness: 1 passed, 1 failed"
+    assert s == "Agent-Harness: 1 passed, 1 failed"
     s2 = console_mod.ConsoleReporter.summary_line([], configuration_errors=2)
     assert "2 failed" in s2
     assert "0 passed" in s2

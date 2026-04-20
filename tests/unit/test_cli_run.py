@@ -61,7 +61,7 @@ def test_cli_run_output_contains_summary_pass_and_fail(
     )
     run_command(_argv(ok))
     out = capsys.readouterr().out
-    assert "AgentHarness:" in out
+    assert "Agent-Harness:" in out
 
     bad = tmp_path / "bad.yaml"
     bad.write_text(
@@ -74,7 +74,7 @@ def test_cli_run_output_contains_summary_pass_and_fail(
     )
     run_command(_argv(bad))
     out2 = capsys.readouterr().out
-    assert "AgentHarness:" in out2
+    assert "Agent-Harness:" in out2
 
 
 def test_cli_entrypoint_smoke(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

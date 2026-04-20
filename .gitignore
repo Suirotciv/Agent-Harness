@@ -28,7 +28,7 @@ env/
 *.swp
 *.swo
 
-# AgentHarness runtime artifacts
+# Agent-Harness runtime artifacts
 .agentharness/
 
 # OS

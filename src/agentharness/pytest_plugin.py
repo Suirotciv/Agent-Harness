@@ -1,4 +1,4 @@
-"""Pytest plugin: ``run`` fixture, ``@scenario`` marker (AD-004), AgentHarness terminal reporting."""
+"""Pytest plugin: ``run`` fixture, ``@scenario`` marker (AD-004), Agent-Harness terminal reporting."""
 
 from __future__ import annotations
 
@@ -109,14 +109,14 @@ def pytest_runtest_makereport(
 def pytest_terminal_summary(
     terminalreporter: pytest.TerminalReporter, exitstatus: int, config: pytest.Config
 ) -> None:
-    """Print AgentHarness assertion failures and configuration errors after pytest's own summary."""
+    """Print Agent-Harness assertion failures and configuration errors after pytest's own summary."""
     if not _SESSION_ASSERTION_RESULTS and not _CONFIG_ERROR_MESSAGES:
         return
 
     from agentharness.reporting.console import ConsoleReporter
 
     if _SESSION_FAILURE_PANELS or _CONFIG_ERROR_MESSAGES:
-        terminalreporter.write_sep("=", "AgentHarness")
+        terminalreporter.write_sep("=", "Agent-Harness")
 
     cr = ConsoleReporter(_SESSION_FAILURE_PANELS)
     block = cr.render_failures()
