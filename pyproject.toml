@@ -1,0 +1,78 @@
+# AgentHarness -- pyproject.toml
+# Project metadata, build configuration, and tool settings.
+# See: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agentharness"
+version = "0.0.1.dev0"
+description = "Open-source test harness for AI agents that take real-world actions."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [
+    { name = "AgentHarness Contributors" },
+]
+keywords = ["ai", "agents", "testing", "harness", "llm", "safety", "compliance"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Testing",
+]
+
+dependencies = [
+    "opentelemetry-sdk>=1.20",
+    "opentelemetry-semantic-conventions>=0.41",
+    "pydantic>=2.0",
+    "pytest>=7.0",
+    "rich>=13.0",
+    "httpx>=0.27",
+    "jsonschema>=4.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest-asyncio>=1.0"]
+langgraph = ["langgraph", "langchain-core"]
+openai = ["openai"]
+anthropic = ["anthropic"]
+crewai = ["crewai"]
+live = ["textual", "fastapi", "uvicorn"]
+compliance = ["jinja2", "weasyprint"]
+langfuse = ["langfuse"]
+arize = ["arize-phoenix", "openinference-semantic-conventions"]
+all = [
+    "agentharness[dev,langgraph,openai,anthropic,crewai,live,compliance,langfuse,arize]",
+]
+
+[project.urls]
+Homepage = "https://github.com/agentharness/agentharness"
+Documentation = "https://agentharness.dev"
+Repository = "https://github.com/agentharness/agentharness"
+
+[project.scripts]
+agentharness = "agentharness.cli.main:cli"
+
+[project.entry-points.pytest11]
+agentharness = "agentharness"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agentharness"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.mypy]
+strict = true
+packages = ["agentharness"]
+
+[tool.ruff]
+target-version = "py310"
+src = ["src"]
