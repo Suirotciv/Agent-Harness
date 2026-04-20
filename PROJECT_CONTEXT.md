@@ -258,6 +258,7 @@ src/agentharness/core/scenario.py       -> Scenario DSL -- start here to underst
 src/agentharness/core/trace.py          -> Trace schema -- start here to understand output format
 ~~src/agentharness/mocks/interceptor.py   -> Tool intercept -- the most critical piece of Phase 0~~
 src/agentharness/mocks/interceptor.py   -> HarnessInterceptor + ToolCallRecord -- framework-agnostic intercept core
+src/agentharness/mocks/cassette.py -> Cassette read/write; make_cassette_key (KI-002), sanitize (KI-006 / AD-005); import from `agentharness.mocks.cassette`
 src/agentharness/adapters/langgraph.py  -> LangGraph ToolNode wiring (native wrap_tool_call + AD-002 fallback)
 src/agentharness/adapters/base.py       -> FrameworkAdapter contract -- implement this for new adapters
 src/agentharness/assertions/safety.py   -> Most important assertions (approval gate, PII, loop)
@@ -285,11 +286,11 @@ pyproject.toml                          -> All dependencies and tool configurati
 | ID | Issue | Severity | Status | Notes |
 |---|---|---|---|---|
 | KI-001 | ~~LangGraph ToolNode interception approach not yet validated against LangGraph 0.4.x~~ **Now:** LangGraph ToolNode interception without patching internals | HIGH | ~~OPEN~~ **RESOLVED** | ~~Must resolve in Phase 0 Sprint 1. If it doesn't work, architecture needs revision. Document fallback plan.~~ **Now:** Validated April 2026 on `langgraph` 1.1.8 / `langgraph-prebuilt` 1.0.10 / `langchain-core` 1.3.0 (Python 3.14 smoke test; project target remains 3.10--3.12 per AD-007). Primary: `wrap_tool_call` / `awrap_tool_call`. Fallback: tool replacement (`create_intercepted_tool_node_fallback`). Evidence: `tests/unit/test_langgraph_intercept.py` (8 tests). Historical note: issue text referenced "0.4.x"; current packages use prebuilt versioning -- track `langgraph-prebuilt` for the `ToolNode` API. |
-| KI-002 | Cassette format needs handling for non-deterministic tool argument ordering (dict key order) | MEDIUM | OPEN | Arguments should be hashed after normalizing key order. |
+| KI-002 | ~~Cassette format needs handling for non-deterministic tool argument ordering (dict key order)~~ | MEDIUM | **RESOLVED** | **Now:** `make_cassette_key` in `mocks/cassette.py` — `sha256(tool_name + sorted_args_json)` per DOMAIN KNOWLEDGE. |
 | KI-003 | PII detection regex approach will have false positives on numerical data | LOW | OPEN | Flag for human review rather than hard failure. Make configurable. |
 | KI-004 | Token cost estimation requires tokencost library to be updated when new models release | LOW | ONGOING | Pin tokencost version; update at each release. Do not state "400+ models" as a static fact. |
 | KI-005 | ~~Async tool interception is unaddressed in Phase 0 design~~ **Now:** Async tool interception alongside sync | HIGH | ~~OPEN~~ **RESOLVED** | ~~LangGraph natively supports async tools. The async wrapper design (handling `async def` tools with proper `await`) must be validated in Phase 0 alongside the sync case.~~ **Now:** Same validation run as KI-001: `test_async_mock_mode`, `test_async_live_mode` (native wrapper), `test_fallback_async_mock_mode` (AD-002). `HarnessInterceptor.intercept_async` + `awrap_tool_call` bridge is the pattern. |
-| KI-006 | Cassette sanitization must be default-on for PII/secrets before version-control commit | MEDIUM | OPEN | See AD-005. Default behavior: PII scrubbing on in compliance mode; secret scrubbing always on. `--allow-sensitive-recording` flag for bypass. |
+| KI-006 | ~~Cassette sanitization must be default-on for PII/secrets before version-control commit~~ | MEDIUM | **RESOLVED** | **Now:** `sanitize` + `save()` in `mocks/cassette.py` (AD-005: secret scrubbing cannot be disabled; PII scrubbing default-on via `Cassette.pii_scrubbed`; `--allow-sensitive-recording` reserved for CLI). |
 | KI-007 | ~~`cli/run.py` per-module `finish()` patching violated AD-011 and would silently miss results from `argument.py`, `safety.py`, `resource.py`~~ | HIGH | **RESOLVED** | Fixed by `_results_collector` `ContextVar` in `assertions/base.py` with `set_results_collector` / `reset_results_collector`; `finish()` appends before raise; CLI binds the list for scenario assertions; pytest uses stash only (documented on `pytest_plugin.py`). |
 
 ---
@@ -384,7 +385,7 @@ Items confirmed for Phase 1 but not yet sprint-planned. Ordering reflects priori
 | .gitattributes + LF normalization | Engineer 2 | **DONE** | Enforces LF repo-wide via `.gitattributes`; `git add --renormalize .` applied; resolves LF→CRLF Git warnings on Windows. *(Infrastructure add-on before collector work; not in original sprint plan.)* |
 | .editorconfig + ruff in CI | Engineer 2 | **DONE** | Root `.editorconfig` (UTF-8, LF, trim rules; `.md` no trim); `[dev]` + `ruff>=0.4.0`; `[tool.ruff]` line-length 88, lint E/F/W/I (E501 ignored until docstring wrap); `[tool.ruff.format]`; parallel `lint` job in `ci.yml` (`pip install -e ".[dev]"`, `ruff check` / `ruff format --check` on `src/`). `extend-exclude`: `assertions` + `adapters` only (`telemetry/collector.py` linted). |
 | telemetry/collector.py | Engineer 1 | **DONE** | `TraceCollector` in `telemetry/collector.py`; `record()` → TOOL spans (`tool.name`, `input.value`, `output.value`); `core/runner.py` + example `executor.py` wire `HarnessInterceptor.record_call` → collector; tests `tests/unit/test_collector.py` |
-| mocks/cassette.py | Engineer 1 | TODO | Cassette read/write; sha256(tool_name + sorted_args_json) key per DOMAIN KNOWLEDGE; secret scrubbing always on, PII scrubbing default per AD-005; closes KI-002 and KI-006 |
+| mocks/cassette.py | Engineer 1 | **DONE** | `Cassette` / `CassetteEntry`, `make_cassette_key`, `sanitize`, `save`/`load`/`lookup`, `default_cassette_path`; tests `tests/unit/test_cassette.py`; KI-002 + KI-006 |
 | cli/record.py — agentharness record | Engineer 1 | TODO | Live run → sanitized cassette; --allow-sensitive-recording flag per AD-005 |
 | Replay mode — agentharness run --replay | Engineer 2 | TODO | Deterministic re-run from cassette; zero variance across 10 runs of same cassette |
 | reporting/diff.py — regression diff | Engineer 2 | TODO | Structural diff between two traces; human-readable output per reporting/ pattern |
@@ -398,7 +399,7 @@ Items confirmed for Phase 1 but not yet sprint-planned. Ordering reflects priori
 - `agentharness run --replay <cassette> --diff <cassette2>` produces human-readable diff output
 - `pip install agentharness==0.1.0a1` works from PyPI
 - All existing unit tests still pass
-- KI-002 and KI-006 resolved
+- KI-002 and KI-006 resolved (`mocks/cassette.py`: `make_cassette_key`, `sanitize`, `save`/`load`)
 
 ### Checkpoint 2 and Checkpoint 3
 

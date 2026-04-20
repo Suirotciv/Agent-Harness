@@ -4,6 +4,14 @@ Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an in
 
 ---
 
+## 2026-04-19 — mocks/cassette.py (KI-002, KI-006)
+
+**Added / updated in PROJECT_CONTEXT.md:** KEY FILE LOCATIONS line for src/agentharness/mocks/cassette.py; KI-002 and KI-006 **RESOLVED** with evidence; Checkpoint 1 sprint row **mocks/cassette.py** **DONE**; exit criterion bullet for KI-002/KI-006 references cassette helpers.
+
+**What shipped:** Cassette, CassetteEntry, make_cassette_key, sanitize, save/load/lookup, default_cassette_path; `tests/unit/test_cassette.py`; `CHANGELOG.md` [Unreleased].
+
+---
+
 ## 2026-04-19 — Telemetry `TraceCollector` (Phase 1 Checkpoint 1)
 
 **Added / updated in `PROJECT_CONTEXT.md`:** Checkpoint 1 sprint rows **telemetry/collector.py** and **Update example 01 to use collector** marked **DONE**; KEY FILE LOCATIONS entry for `src/agentharness/telemetry/collector.py` (import from `agentharness.telemetry.collector`, not package root).
