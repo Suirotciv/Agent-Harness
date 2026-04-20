@@ -1,0 +1,5 @@
+[console_scripts]
+agentharness = agentharness.cli.main:cli
+
+[pytest11]
+agentharness = agentharness.pytest_plugin
