@@ -1,0 +1,5 @@
+# Phase 0 minimal scenario - Sprint 1 exit criteria evidence.
+# Synthetic tool order in trace (LangGraph wiring later).
+tool_calls:
+  - lookup_order
+  - issue_refund

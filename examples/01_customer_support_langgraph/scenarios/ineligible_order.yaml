@@ -1,0 +1,15 @@
+# Ineligible order: agent escalates; completion and ordering assertions.
+scenario_id: example/customer_support/ineligible_order
+mock_responses:
+  check_refund_eligibility: '{"order_id":"ORD-X","eligible":false,"reason":"final_sale"}'
+steps:
+  - tool: lookup_order
+    args:
+      order_id: ORD-X
+  - tool: check_refund_eligibility
+    args:
+      order_id: ORD-X
+  - tool: escalate_to_human
+    args:
+      order_id: ORD-X
+      reason: ineligible_final_sale

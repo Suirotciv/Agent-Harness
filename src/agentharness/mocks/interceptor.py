@@ -162,9 +162,7 @@ class HarnessInterceptor:
 
         # LIVE mode -- call the real tool
         if execute_real is None:
-            raise ValueError(
-                "execute_real callable is required in LIVE mode."
-            )
+            raise ValueError("execute_real callable is required in LIVE mode.")
 
         try:
             response = execute_real()
@@ -216,9 +214,7 @@ class HarnessInterceptor:
             return response
 
         if execute_real is None:
-            raise ValueError(
-                "execute_real callable is required in LIVE mode."
-            )
+            raise ValueError("execute_real callable is required in LIVE mode.")
 
         try:
             response = await execute_real()

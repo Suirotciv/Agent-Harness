@@ -1,0 +1,11 @@
+# Only issue_refund — mutually exclusive with escalate_to_human for this run.
+scenario_id: example/customer_support/mutual_exclusion
+steps:
+  - tool: lookup_order
+    args:
+      order_id: ORD-M
+  - tool: issue_refund
+    args:
+      order_id: ORD-M
+      amount: 10.0
+      approved: true

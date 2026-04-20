@@ -33,13 +33,24 @@ dependencies = [
     "opentelemetry-semantic-conventions>=0.41",
     "pydantic>=2.0",
     "pytest>=7.0",
+    "pyyaml>=6.0",
     "rich>=13.0",
     "httpx>=0.27",
     "jsonschema>=4.0",
 ]
 
+# Optional extras: `tokencost` is pinned only under [resource]. [dev] pulls it in via
+# `agentharness[resource]` so the version cannot drift. types-* packages are for mypy;
+# CI uses `pip install -e ".[langgraph,dev]"` (see .github/workflows/ci.yml), not [all].
 [project.optional-dependencies]
-dev = ["pytest-asyncio>=1.0"]
+resource = ["tokencost>=0.1"]
+dev = [
+    "agentharness[resource]",
+    "pytest-asyncio>=1.0",
+    "types-jsonschema>=4.0",
+    "types-PyYAML>=6.0",
+    "ruff>=0.4.0",
+]
 langgraph = ["langgraph", "langchain-core"]
 openai = ["openai"]
 anthropic = ["anthropic"]
@@ -61,7 +72,7 @@ Repository = "https://github.com/agentharness/agentharness"
 agentharness = "agentharness.cli.main:cli"
 
 [project.entry-points.pytest11]
-agentharness = "agentharness"
+agentharness = "agentharness.pytest_plugin"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/agentharness"]
@@ -74,5 +85,20 @@ strict = true
 packages = ["agentharness"]
 
 [tool.ruff]
+line-length = 88
 target-version = "py310"
-src = ["src"]
+# Phase 1 Checkpoint 1: do not reformat/lint these packages until scheduled (PROJECT_CONTEXT).
+extend-exclude = [
+    "src/agentharness/assertions",
+    "src/agentharness/adapters",
+    "src/agentharness/telemetry",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+# E501 (line length) deferred: many docstrings exceed 88 cols; wrap in a follow-up without blocking CI.
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

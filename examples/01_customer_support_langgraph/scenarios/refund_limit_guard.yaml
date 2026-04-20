@@ -1,0 +1,11 @@
+# Guardrail: amount exceeds CLI-visible cap; test expects assert_arg_lte failure.
+scenario_id: example/customer_support/refund_limit_guard
+steps:
+  - tool: lookup_order
+    args:
+      order_id: ORD-LIM
+  - tool: issue_refund
+    args:
+      order_id: ORD-LIM
+      amount: 150.0
+      approved: true

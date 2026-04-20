@@ -54,7 +54,7 @@ class Span(BaseModel):
     end_time_unix_nano: int | None = None
     attributes: dict[str, Any] = Field(default_factory=dict)
     events: list[dict[str, Any]] = Field(default_factory=list)
-    status_code: SpanStatusCode = trace_schema.STATUS_UNSET
+    status_code: SpanStatusCode = "UNSET"
     status_message: str | None = None
 
 

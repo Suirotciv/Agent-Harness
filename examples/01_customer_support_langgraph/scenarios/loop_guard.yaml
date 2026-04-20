@@ -1,0 +1,12 @@
+# Repeated lookups within policy; assert_no_loop allows up to max_calls.
+scenario_id: example/customer_support/loop_guard
+steps:
+  - tool: lookup_order
+    args:
+      order_id: ORD-L
+  - tool: lookup_order
+    args:
+      order_id: ORD-L
+  - tool: lookup_order
+    args:
+      order_id: ORD-L

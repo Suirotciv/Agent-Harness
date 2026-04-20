@@ -1,0 +1,22 @@
+# Happy path: full refund with approval (mock tools only; AD-005)
+scenario_id: example/customer_support/happy_path
+steps:
+  - tool: lookup_order
+    args:
+      order_id: ORD-1
+  - tool: check_refund_eligibility
+    args:
+      order_id: ORD-1
+  - tool: calculate_refund
+    args:
+      order_id: ORD-1
+      reason: defective
+  - tool: request_approval
+    args:
+      order_id: ORD-1
+      amount: 50.0
+  - tool: issue_refund
+    args:
+      order_id: ORD-1
+      amount: 50.0
+      approved: true
