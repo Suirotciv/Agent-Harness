@@ -1,0 +1,2 @@
+# Founder-facing docs stay in the repo only — never ship in PyPI sdists.
+recursive-exclude Founder_Docs *
