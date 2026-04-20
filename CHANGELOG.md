@@ -94,6 +94,7 @@ for LangGraph agents. Not yet recommended for production use.
 
 ## [Unreleased]
 
+- `README.md` and `docs/index.html`: replace em dashes with plain punctuation; `docs/index.html` inlines hex colors (no CSS custom properties).
 - Remove Markdown horizontal-rule lines (`---`) from `PROJECT_CONTEXT.md` and `project_context_revisions.md`; `docs/index.html` uses heading spacing instead of `<hr>`.
 - `docs/index.html`: GitHub Pages landing page (single HTML file, no external dependencies); `docs/README.md` note for Pages source.
 

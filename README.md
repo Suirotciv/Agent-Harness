@@ -63,7 +63,7 @@ The example package overrides the `run` fixture so YAML `steps` execute under La
 - Not a full LLMOps platform
 - Not framework-specific (not a LangChain product)
 - Not an LLM benchmark (not SWE-bench or WebArena)
-- Not a replacement for LangSmith, DeepEval, or TruLens — complementary behavioral testing over traces
+- Not a replacement for LangSmith, DeepEval, or TruLens; complementary behavioral testing over traces
 
 ## Available assertions
 
@@ -92,17 +92,17 @@ Optional `--mode mock|live` (default `mock`).
 
 ## Demo and screenshots
 
-Agent-Harness is terminal-first (pytest + CLI)—there is no separate web UI to demo. Step-by-step commands and a short live script: [docs/demo.md](docs/demo.md).
+Agent-Harness is terminal-first (pytest + CLI). There is no separate web UI to demo. Step-by-step commands and a short live script: [docs/demo.md](docs/demo.md).
 
-**Pytest** — example happy-path (`test_happy_path`):
+**Pytest:** example happy-path (`test_happy_path`):
 
 ![Pytest happy path](docs/images/01-pytest-happy.png)
 
-**CLI** — `agentharness run` on the safety scenario (mock):
+**CLI:** `agentharness run` on the safety scenario (mock):
 
 ![CLI pass](docs/images/02-cli-pass.png)
 
-**Replay + diff** — cassette comparison:
+**Replay + diff:** cassette comparison:
 
 ![Replay and diff](docs/images/03-replay-diff.png)
 
@@ -113,7 +113,7 @@ CLI `run`, example agent) is complete. **0.1.0a2** is on PyPI as an alpha (`pyte
 
 ## License
 
-Apache License 2.0 — see `LICENSE` and `pyproject.toml`.
+Apache License 2.0. See `LICENSE` and `pyproject.toml`.
 
 ## Contributing
 

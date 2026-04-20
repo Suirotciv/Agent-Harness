@@ -5,18 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Agent-Harness</title>
   <style>
-    :root {
-      --bg: #0d1117;
-      --text: #e6edf3;
-      --accent: #58a6ff;
-      --muted: #8b949e;
-    }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: #0d1117;
+      color: #e6edf3;
       line-height: 1.5;
       padding: 1rem 1.25rem 2.5rem;
     }
@@ -30,7 +24,7 @@
       margin: 0 0 0.35rem;
     }
     .tagline {
-      color: var(--muted);
+      color: #8b949e;
       font-size: 1rem;
       margin: 0 0 1.25rem;
     }
@@ -38,7 +32,7 @@
       font-size: 1.15rem;
       font-weight: 600;
       margin: 0 0 0.5rem;
-      color: var(--text);
+      color: #e6edf3;
     }
     p {
       margin: 0 0 0.75rem;
@@ -49,7 +43,7 @@
     }
     li { margin-bottom: 0.35rem; }
     a {
-      color: var(--accent);
+      color: #58a6ff;
       text-decoration: none;
     }
     a:hover { text-decoration: underline; }
@@ -68,12 +62,12 @@
       overflow-x: auto;
       margin: 0 0 1rem;
     }
-    .muted { color: var(--muted); font-size: 0.9rem; }
+    .muted { color: #8b949e; font-size: 0.9rem; }
     footer {
       margin-top: 2rem;
       padding-top: 1rem;
       border-top: 1px solid #30363d;
-      color: var(--muted);
+      color: #8b949e;
       font-size: 0.9rem;
     }
   </style>
@@ -90,7 +84,7 @@
       Publicly reported incidents include a long-running multi-agent loop with on the order of tens of thousands of dollars in API spend (Dev.to post-mortem, TowardsAI, Hacker News),
       a Replit AI workflow that deleted production records and added fabricated data with vendor acknowledgment (Business Insider, The Register, Fast Company, Replit),
       and an Amazon-internal coding-agent change that removed and recreated production cloud configuration and caused a multi-hour outage (Financial Times, AI Incident Database, Reddit r/aws).
-      Those map to tool-use failures—unbounded loops, destructive writes, inherited operator access—not only bad text output. Agent-Harness is for automated checks over <em>which tools ran, in what order, and with what arguments</em> in test runs.
+      Those map to tool-use failures (unbounded loops, destructive writes, inherited operator access), not only bad text output. Agent-Harness is for automated checks over <em>which tools ran, in what order, and with what arguments</em> in test runs.
     </p>
 
     <h2>What it does</h2>
@@ -133,7 +127,7 @@ def test_happy_path(run):
     <h2>Looking for collaborators</h2>
     <p>
       This is an alpha-stage, mostly solo-maintained project with a broad roadmap (more adapters, harder CI stories, optional compliance-oriented reporting).
-      If you have shipped Python test tooling, agents, or safety-sensitive systems and want to help—issues, docs, or code—open a thread on GitHub.
+      If you have shipped Python test tooling, agents, or safety-sensitive systems and want to contribute, start on GitHub (issues, docs, or code).
       There is no company behind this page and no user-count to show; interest is welcome, not promised.
     </p>
     <p><a href="https://github.com/Suirotciv/Agent-Harness">github.com/Suirotciv/Agent-Harness</a></p>
