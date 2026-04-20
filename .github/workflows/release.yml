@@ -1,4 +1,4 @@
-# Triggered by: git tag v0.1.0a1 && git push --tags
+# Triggered by: git tag v0.1.0a2 && git push --tags
 name: Release
 
 on:

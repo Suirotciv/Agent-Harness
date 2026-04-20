@@ -25,7 +25,7 @@ pip install -e ".[langgraph,dev]"
 **PyPI (alpha):** The published package is `pytest-agentharness`. To match CI and the LangGraph example:
 
 ```bash
-pip install "pytest-agentharness[langgraph,dev]==0.1.0a1"
+pip install "pytest-agentharness[langgraph,dev]==0.1.0a2"
 ```
 
 The GitHub repository name is **Agent-Harness**; the Python package import remains `agentharness`.
@@ -109,7 +109,7 @@ Agent-Harness is terminal-first (pytest + CLI)—there is no separate web UI to 
 ## Roadmap
 
 Phase 0 (foundation, pytest plugin, assertions, LangGraph adapter,
-CLI `run`, example agent) is complete. **0.1.0a1** is on PyPI as an alpha (`pytest-agentharness`). Phase 1 continues with additional adapters (e.g. OpenAI, CrewAI), multi-run statistical mode, and follow-on releases. A fuller public roadmap is planned before the Phase 1 launch milestone.
+CLI `run`, example agent) is complete. **0.1.0a2** is on PyPI as an alpha (`pytest-agentharness`). Phase 1 continues with additional adapters (e.g. OpenAI, CrewAI), multi-run statistical mode, and follow-on releases. A fuller public roadmap is planned before the Phase 1 launch milestone.
 
 ## License
 

@@ -24,7 +24,7 @@ Phase:        1 -- MVP
 Checkpoint:   1 of 3
 Blockers:     None
 Last Updated: April 2026
-Last Release: 0.1.0a1 (alpha)
+Last Release: 0.1.0a2 (alpha)
 ```
 
 ### What We Are Building Right Now
@@ -401,7 +401,7 @@ Items confirmed for Phase 1 but not yet sprint-planned. Ordering reflects priori
 - `agentharness record scenarios/safety/refund_limit_guard.yaml` produces a sanitized cassette file
 - `agentharness run --replay <cassette>` produces identical pass/fail output across 10 runs
 - `agentharness run --replay <cassette> --diff <cassette2>` produces human-readable diff output
-- `pip install agentharness==0.1.0a1` works from PyPI
+- `pip install pytest-agentharness==0.1.0a2` works from PyPI
 - All existing unit tests still pass
 - KI-002 and KI-006 resolved (`mocks/cassette.py`: `make_cassette_key`, `sanitize`, `save`/`load`)
 

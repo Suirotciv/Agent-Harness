@@ -4,6 +4,14 @@ Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an in
 
 ---
 
+## 2026-04-20 — PyPI 0.1.0a2 (documentation release)
+
+**Added / updated in `PROJECT_CONTEXT.md`:** `CURRENT STATUS` line `Last Release: 0.1.0a2 (alpha)`; Checkpoint 1 exit criterion bullet updated from `pip install agentharness==0.1.0a1` to `pip install pytest-agentharness==0.1.0a2` (correct distribution name).
+
+**What shipped:** `pyproject.toml` / `__version__` **0.1.0a2**; `CHANGELOG.md` `[0.1.0a2]`; README and `docs/demo.md` install pins; no runtime API changes.
+
+---
+
 ## 2026-04-19 — PyPI 0.1.0a1 alpha prep (build + release workflow)
 
 **Added / updated in `PROJECT_CONTEXT.md`:** CURRENT STATUS line `Last Release: 0.1.0a1 (alpha)`; Checkpoint 1 sprint row **PyPI 0.1.0-alpha prep** **DONE**; `CHANGELOG.md` section `[0.1.0a1]`.

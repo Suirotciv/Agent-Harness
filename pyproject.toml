@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pytest-agentharness"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Open-source test harness for AI agents that take real-world actions."
 readme = "README.md"
 license = { text = "Apache-2.0" }

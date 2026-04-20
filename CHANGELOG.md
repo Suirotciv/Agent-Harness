@@ -2,6 +2,19 @@
 
 All notable changes to Agent-Harness will be documented in this file.
 
+## [0.1.0a2] -- 2026-04-20
+
+### Summary
+
+Documentation-only release: collaborator demo guide, embedded README screenshots, GitHub URL and branding alignment; PyPI README refresh. No API changes.
+
+### Changed
+
+- `README.md`: PyPI install pins `pytest-agentharness==0.1.0a2`; roadmap line; Demo and screenshots with terminal captures under `docs/images/`.
+- `docs/demo.md`: install pins, link to README screenshots; status line.
+- `PROJECT_CONTEXT.md`: `Last Release` and Checkpoint 1 exit criterion use `pytest-agentharness==0.1.0a2`.
+- `pyproject.toml` / `src/agentharness/__init__.py`: version **0.1.0a2**.
+
 ## [0.1.0a1] -- 2026-04-19
 
 ### Summary
@@ -81,7 +94,4 @@ for LangGraph agents. Not yet recommended for production use.
 
 ## [Unreleased]
 
-- README: embed `docs/images/` terminal screenshots under Demo and screenshots; `docs/demo.md` points to that section.
-- Add `docs/demo.md` (collaborator demo, PyPI pin, screenshot table) and `docs/images/` placeholder; link from `README.md`; cross-link `examples/04_record_replay_demo/README.md`.
-- pyproject.toml URLs corrected to https://github.com/Suirotciv/Agent-Harness; dist/ and *.egg-info/ added to .gitignore.
 
