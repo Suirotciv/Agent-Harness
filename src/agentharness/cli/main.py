@@ -47,6 +47,22 @@ def _build_parser() -> argparse.ArgumentParser:
             "(default: cassettes/<scenario_stem>.json under cwd). Forces replay mode."
         ),
     )
+    run_p.add_argument(
+        "--diff",
+        type=str,
+        default=None,
+        metavar="PATH",
+        help=(
+            "Baseline trace: cassette JSON (.json) or trace JSONL (.jsonl). "
+            "After the run, compare the candidate trace to this baseline (informational)."
+        ),
+    )
+    run_p.add_argument(
+        "--diff-mode",
+        choices=("strict", "subset", "superset"),
+        default="strict",
+        help="How to compare baseline vs candidate when --diff is set (default: strict).",
+    )
 
     sub.add_parser("watch", help="(Planned) Watch a live agent run.")
     record_p = sub.add_parser(

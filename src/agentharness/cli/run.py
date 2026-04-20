@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -15,6 +15,7 @@ from agentharness.assertions.base import (
     set_results_collector,
 )
 from agentharness.assertions.structural import assert_called_before
+from agentharness.core.result import RunResult
 from agentharness.core.runner import run_scenario
 from agentharness.core.trace import Trace
 from agentharness.mocks.interceptor import ReplayCassetteError
@@ -29,6 +30,26 @@ def _load_scenario_yaml(path: Path) -> Any:
     runner and CLI share the same YAML structure (``tool_calls``, optional ``assertions``).
     """
     return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
+def _load_baseline_trace(path: Path) -> Trace:
+    """Load a baseline trace from a cassette ``.json`` or trace ``.jsonl`` file."""
+    suffix = path.suffix.lower()
+    if suffix == ".jsonl":
+        from agentharness.telemetry.jsonl import iter_traces_jsonl
+
+        first = next(iter(iter_traces_jsonl(path)), None)
+        if first is None:
+            msg = f"no trace lines in {path}"
+            raise ValueError(msg)
+        return first
+    if suffix == ".json":
+        from agentharness.mocks.cassette import load as load_cassette
+        from agentharness.reporting.diff import trace_from_cassette
+
+        return trace_from_cassette(load_cassette(path))
+    msg = f"unsupported baseline trace format (use .json cassette or .jsonl): {path}"
+    raise ValueError(msg)
 
 
 def _run_yaml_assertions(data: dict[str, Any], trace: Trace) -> None:
@@ -77,6 +98,7 @@ def run_command(args: argparse.Namespace) -> int:
 
     collected: list[AssertionResult] = []
     tok = set_results_collector(collected)
+    result: RunResult | None = None
     try:
         try:
             replay_arg = getattr(args, "replay", None)
@@ -127,6 +149,22 @@ def run_command(args: argparse.Namespace) -> int:
             sys.stdout.write("\n")
     summary = ConsoleReporter.summary_line(assertion_results, configuration_errors=0)
     sys.stdout.write(summary + "\n")
+
+    diff_arg = getattr(args, "diff", None)
+    if diff_arg is not None:
+        assert result is not None
+        from agentharness.reporting.diff import DiffMode, diff_traces, format_diff
+
+        try:
+            baseline = _load_baseline_trace(Path(diff_arg).resolve())
+        except (ValueError, OSError, FileNotFoundError) as exc:
+            sys.stderr.write(
+                f"agentharness run: could not load baseline trace: {exc}\n",
+            )
+            return 2
+        mode = cast(DiffMode, getattr(args, "diff_mode", "strict"))
+        td = diff_traces(baseline, result.trace, mode=mode)
+        sys.stdout.write(format_diff(td) + "\n")
 
     if failures:
         return 1
