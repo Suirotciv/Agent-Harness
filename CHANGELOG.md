@@ -94,4 +94,5 @@ for LangGraph agents. Not yet recommended for production use.
 
 ## [Unreleased]
 
+- `docs/index.html`: GitHub Pages landing page (single HTML file, no external dependencies); `docs/README.md` note for Pages source.
 

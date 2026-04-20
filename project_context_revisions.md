@@ -4,6 +4,14 @@ Archive of substantive **`PROJECT_CONTEXT.md`** edits (newest first). When an in
 
 ---
 
+## 2026-04-21 — GitHub Pages static landing (`docs/index.html`)
+
+**`PROJECT_CONTEXT.md`:** no inline edit (incident summaries align with `Founder_Docs/project_proposal.md` motivating-incidents section; that section is not duplicated in tracked `PROJECT_CONTEXT.md`).
+
+**What shipped:** `docs/index.html` (single-file, inline CSS, no CDN); `docs/README.md` one-line pointer so the `docs/` folder is not mistaken for a second project README; `CHANGELOG.md` [Unreleased] bullet.
+
+---
+
 ## 2026-04-20 — PyPI 0.1.0a2 (documentation release)
 
 **Added / updated in `PROJECT_CONTEXT.md`:** `CURRENT STATUS` line `Last Release: 0.1.0a2 (alpha)`; Checkpoint 1 exit criterion bullet updated from `pip install agentharness==0.1.0a1` to `pip install pytest-agentharness==0.1.0a2` (correct distribution name).

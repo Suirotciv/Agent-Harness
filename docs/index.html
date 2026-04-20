@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent-Harness</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --text: #e6edf3;
+      --accent: #58a6ff;
+      --muted: #8b949e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 1rem 1.25rem 2.5rem;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin: 0 0 0.35rem;
+    }
+    .tagline {
+      color: var(--muted);
+      font-size: 1rem;
+      margin: 0 0 1.25rem;
+    }
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem;
+      color: var(--text);
+    }
+    p {
+      margin: 0 0 0.75rem;
+    }
+    ul {
+      margin: 0 0 0.75rem;
+      padding-left: 1.25rem;
+    }
+    li { margin-bottom: 0.35rem; }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+    hr {
+      border: 0;
+      border-top: 1px solid #30363d;
+      margin: 1.5rem 0;
+    }
+    pre {
+      font-family: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "Liberation Mono", Menlo, Monaco, Consolas, monospace;
+      font-size: 0.875rem;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 0 0 1rem;
+    }
+    .muted { color: var(--muted); font-size: 0.9rem; }
+    footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #30363d;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Agent-Harness</h1>
+      <p class="tagline">Open-source test harness for AI agents that take real-world actions.</p>
+    </header>
+
+    <h2>Why it exists</h2>
+    <p>
+      Publicly reported incidents include a long-running multi-agent loop with on the order of tens of thousands of dollars in API spend (Dev.to post-mortem, TowardsAI, Hacker News),
+      a Replit AI workflow that deleted production records and added fabricated data with vendor acknowledgment (Business Insider, The Register, Fast Company, Replit),
+      and an Amazon-internal coding-agent change that removed and recreated production cloud configuration and caused a multi-hour outage (Financial Times, AI Incident Database, Reddit r/aws).
+      Those map to tool-use failures—unbounded loops, destructive writes, inherited operator access—not only bad text output. Agent-Harness is for automated checks over <em>which tools ran, in what order, and with what arguments</em> in test runs.
+    </p>
+
+    <hr>
+
+    <h2>What it does</h2>
+    <p>You write tests against a trace of tool calls. For example, you can check that:</p>
+    <ul>
+      <li>One tool ran before another (<code>assert_called_before</code>).</li>
+      <li>A tool appears an exact number of times in order (<code>assert_call_count</code>).</li>
+      <li>Tool spans finish without error status where that applies (<code>assert_completion</code>).</li>
+      <li>Two conflicting tools are not both used in the same run (<code>assert_mutual_exclusion</code>).</li>
+      <li>A numeric argument stays at or below a bound (<code>assert_arg_lte</code>).</li>
+      <li>Calls to a sensitive tool include an approval-style field (<code>assert_approval_gate</code>).</li>
+    </ul>
+    <p class="muted">Assertions can attach citation strings for documentation and reporting; they do not by themselves establish legal compliance.</p>
+
+    <hr>
+
+    <h2>Quickstart (Python)</h2>
+<pre><code>from agentharness import (
+    assert_approval_gate,
+    assert_arg_lte,
+    assert_called_before,
+    scenario,
+)
+
+
+@scenario("examples/01_customer_support_langgraph/scenarios/happy_path.yaml")
+def test_happy_path(run):
+    assert_called_before(run.trace, "lookup_order", "issue_refund")
+    assert_arg_lte(run.trace, tool="issue_refund", arg="amount", value=100)
+    assert_approval_gate(run.trace, tool="issue_refund")
+</code></pre>
+
+    <hr>
+
+    <h2>Install</h2>
+    <p>From a clone of the repository (run at repo root):</p>
+<pre><code>pip install -e ".[langgraph,dev]"
+</code></pre>
+    <p>
+      An alpha is published on PyPI as <code>pytest-agentharness</code>; version pins and extras are listed in the repository README.
+      Treat the project as early software: APIs and packaging can change between alphas.
+    </p>
+
+    <hr>
+
+    <h2>Looking for collaborators</h2>
+    <p>
+      This is an alpha-stage, mostly solo-maintained project with a broad roadmap (more adapters, harder CI stories, optional compliance-oriented reporting).
+      If you have shipped Python test tooling, agents, or safety-sensitive systems and want to help—issues, docs, or code—open a thread on GitHub.
+      There is no company behind this page and no user-count to show; interest is welcome, not promised.
+    </p>
+    <p><a href="https://github.com/Suirotciv/Agent-Harness">github.com/Suirotciv/Agent-Harness</a></p>
+
+    <hr>
+
+    <h2>Links</h2>
+    <ul>
+      <li><a href="https://github.com/Suirotciv/Agent-Harness">Repository</a></li>
+      <li><a href="https://github.com/Suirotciv/Agent-Harness/blob/master/README.md">README on GitHub</a></li>
+      <li><a href="https://github.com/Suirotciv/Agent-Harness/issues">Open issues</a></li>
+    </ul>
+
+    <footer>
+      Licensed under the Apache License 2.0.
+    </footer>
+  </div>
+</body>
+</html>
